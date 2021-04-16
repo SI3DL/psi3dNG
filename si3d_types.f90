@@ -169,7 +169,7 @@
    REAL, ALLOCATABLE, DIMENSION(:,:) :: th, th1,haypp2,th2,th12
 
    !         -----Surface Temperature Boundary Conditions Vars. & Arrays ---------
-
+   INTEGER, PARAMETER :: nvSurfbcW = 3; ! No. of variables read on onlyWind case
    INTEGER, PARAMETER :: nvSurfbcP = 6; ! No. of variables read on pre-process mode
    INTEGER, PARAMETER :: nvSurfbcR = 9; ! No. of variables read on run-time mode
    INTEGER :: ifSurfbc          ! Flag that specifies whether surf.BC. are used
@@ -239,23 +239,23 @@
                                           uhEBpp, uhWBpp, huEBpp, huWBpp, nnH,nnHH, &
                                           sEBpp , sWBpp , sEBp  , sWBp  , &  !MAC NESTING
                                           sEB   , sWB   , auxhEBpp, auxhWBpp, &
-                                          auxhEBp, auxhWBp, auxhEB, auxhWB 
+                                          auxhEBp, auxhWBp, auxhEB, auxhWB
    REAL, ALLOCATABLE, DIMENSION(:,:  ) :: vhNB  , vhSB  , hvNB  , hvSB  , &
                                           vhNBp , vhSBp , hvNBp , hvSBp , &
                                           vhNBpp, vhSBpp, hvNBpp, hvSBpp, &
                                           sNBpp , sSBpp , sNBp  , sSBp  , &  !MAC NESTING
                                           sNB   , sSB   , auxhNBpp, auxhSBpp, &
-                                          auxhNBp, auxhSBp, auxhNB, auxhSB 
+                                          auxhNBp, auxhSBp, auxhNB, auxhSB
    REAL, ALLOCATABLE, DIMENSION(:,:  ) :: uhNB  , uhSB  , huNB  , huSB  , &
                                           uhNBp , uhSBp , huNBp , huSBp , &
                                           uhNBpp, uhSBpp, huNBpp, huSBpp, &
                                           agNB, arNB, agSB, arSB
-                                           
+
    REAL, ALLOCATABLE, DIMENSION(:,:  ) :: vhEB  , vhWB  , hvEB  , hvWB  , &
                                           vhEBp , vhWBp , hvEBp , hvWBp , &
                                           vhEBpp, vhWBpp, hvEBpp, hvWBpp, &
                                           agEB, arEB, agWB, arWB
-                                          
+
 
 
    !         ----- Arrays & vars. for nesting boundary outputs  -----------------------
@@ -317,26 +317,26 @@
                                             trcsx, trcsy, trcsz, trcpk
 
    !          ----- Point Sources & Sinks Eqs. Vars. & Arrays *********************
-   ! ... Variables used specificallly to model plumes - 
+   ! ... Variables used specificallly to model plumes -
    REAL    :: k4sod      ! 5.7870E-6 ! g/m2/s
    REAL(8) :: salamb     ! Vars. for generalized version of plume model
    REAL(8) :: patm       ! Vars. for generalized version of plume model
    REAL   , ALLOCATABLE, DIMENSION(:    )  :: lambda ! Plume width
    REAL   , ALLOCATABLE, DIMENSION(:    )  :: diammb ! Initial diammeter of bubbles
    INTEGER, ALLOCATABLE, DIMENSION(:    )  :: kdetr          ! k for detrainment cell
-   INTEGER, ALLOCATABLE, DIMENSION(:    )  :: idetr          ! How detrainment is modelled in diffuser devices 
+   INTEGER, ALLOCATABLE, DIMENSION(:    )  :: idetr          ! How detrainment is modelled in diffuser devices
    REAL   , ALLOCATABLE, DIMENSION(:    )  :: dfL            ! Diffuser length (device)
 
    ! ... Variables for boundary conditions as point sources and sinks BCasPSS
    INTEGER :: npssdev    ! No. of devices producing point sinks and sources (i.e. diffusers)
    INTEGER :: iopss      ! No. of colums with sources/sinks
-   REAL    :: dtsecpss   ! Time in seconds between consecutive records in io files  
+   REAL    :: dtsecpss   ! Time in seconds between consecutive records in io files
    INTEGER, ALLOCATABLE, DIMENSION(:    )  :: iopssH
    INTEGER, ALLOCATABLE, DIMENSION(:,:  )  :: ioph2iop
    INTEGER, ALLOCATABLE, DIMENSION(:    )  :: ptype          ! Type of PSS simulated (device)
    REAL   , ALLOCATABLE, DIMENSION(:,:,:)  :: varspss        ! flows, temps. & tracers = f(time,dev)
-   INTEGER, ALLOCATABLE, DIMENSION(:    )  :: pdt            ! Frequency of update (device) 
-   INTEGER, ALLOCATABLE, DIMENSION(:    )  :: iodev          ! Device No. for each pss (column) 
+   INTEGER, ALLOCATABLE, DIMENSION(:    )  :: pdt            ! Frequency of update (device)
+   INTEGER, ALLOCATABLE, DIMENSION(:    )  :: iodev          ! Device No. for each pss (column)
    INTEGER, ALLOCATABLE, DIMENSION(:    )  :: ipss,jpss      ! Grid location of pss (column)
    REAL   , ALLOCATABLE, DIMENSION(:,:  )  :: Qpss	         ! Inflow/outflow rate at n+1 (column)
    REAL   , ALLOCATABLE, DIMENSION(:,:  )  :: Tpss           ! Temp. for pss at n+1 - (column)
@@ -352,7 +352,7 @@
 
 
    !        -------- ECOMOD - Ecological model ***************************************
-   INTEGER :: ecomod ! Type of behaviour assigned to tracers 
+   INTEGER :: ecomod ! Type of behaviour assigned to tracers
    INTEGER, PARAMETER :: testcase = 3 ! FJR
 
    !        -------- Energy & Scalar balances *****************************************
@@ -372,4 +372,3 @@
 !                        -----Data Dictionary-----
 
 END MODULE si3d_types
-

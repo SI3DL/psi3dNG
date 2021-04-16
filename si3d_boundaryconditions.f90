@@ -24,19 +24,19 @@ SUBROUTINE openbc0
 !
 !  Purpose: This routine is called at the beginning of the program
 !           to open any files with boundary condition data, to
-!           read the boundary condition data, and to 
-!           assign the initial boundary values at time t=0.  
+!           read the boundary condition data, and to
+!           assign the initial boundary values at time t=0.
 !
 !------------------------------------------------------------------------
 
    !.....Local variables.....
    REAL :: areatot, uavg, vavg, sbc, qbc, hbc
-   INTEGER :: i, j, k, l, nn, is, ie, js, je, ks, ke, & 
+   INTEGER :: i, j, k, l, nn, is, ie, js, je, ks, ke, &
               kmx, kmy, nwlayers, ios, istat,laux
    INTEGER :: nbiid, noNGB, maxiptsNB, niNGB, icl, m1, m2
    INTEGER :: npts_wse, npts_flw, npts_sal, nptsOpenBC
    CHARACTER(LEN=14) :: openbcfmt, openbcfile
-   REAL, ALLOCATABLE, DIMENSION(:,:) :: inputvar 
+   REAL, ALLOCATABLE, DIMENSION(:,:) :: inputvar
 
    ! ... Return if no open boundaries exist
    IF (nopen <= 0) RETURN
@@ -46,7 +46,7 @@ SUBROUTINE openbc0
    ! ---- Initialize No. of nested grid boundaries to zero
    noNGB = 0; maxiptsNB = -1;
 
-   ! ----Loop over nopen to Open & read files with bc data-----  
+   ! ----Loop over nopen to Open & read files with bc data-----
    DO nn = 1, nopen
 
       SELECT CASE (itype(nn))
@@ -79,7 +79,7 @@ SUBROUTINE openbc0
 
       ! Write the format of the data records into an internal file
       WRITE (UNIT=openbcfmt, FMT='("(10X,",I3,"G11.2)")') ntr+2
- 
+
       ! Read data array
       DO j = 1, nptsOpenBC
          READ (UNIT=i52, FMT=openbcfmt, IOSTAT=ios) &
@@ -103,9 +103,9 @@ SUBROUTINE openbc0
 
         !... Read type of boundary (needs to agree with input file)
         READ (nbiid) isdNBI(nn)
-        !... Read time information (no. of frames) 
+        !... Read time information (no. of frames)
         READ (nbiid) nfrNBI(nn)
-        !... Read spatial information (no. of cells)  
+        !... Read spatial information (no. of cells)
         READ (nbiid) iptNBI(nn), ntrNBI(nn)
         print *,"openbc1"
         ! ... Check whether the length of simulations in the fine & coarse
@@ -115,13 +115,13 @@ SUBROUTINE openbc0
           PRINT * , 'Nested Boundary File no. = ', nn
           PRINT * , 'nframes in NB file = ', nfrNBI(nn)
           PRINT * , 'Time (s) between frames  = ', dtsecOpenBC
-          PRINT * , 'Length of time simulated = ', tl 
+          PRINT * , 'Length of time simulated = ', tl
           STOP
         ENDIF
         print *,"openbc12"
-        ! ... Increase the no. of nested grid boundaries by 1, update 
+        ! ... Increase the no. of nested grid boundaries by 1, update
         !     max. no. of points within nested grid boundaries, and
-        !     check for consistency between information from the coarse 
+        !     check for consistency between information from the coarse
         !     and information required by the fine grids
         noNGB = noNGB + 1
         maxiptsNB = MAX(maxiptsNB, iptNBI(nn))
@@ -149,7 +149,7 @@ SUBROUTINE openbc0
    ! -------------- Nested Grid Boundaries READ & CHECK -------------------
    IF ( noNGB > 0) THEN
 
-     ! ... Allocate space for arrays holding nested grid boundaries 
+     ! ... Allocate space for arrays holding nested grid boundaries
      ALLOCATE ( uhNGB(maxiptsNB,noNGB), uhNGBp(maxiptsNB,noNGB), &
                 vhNGB(maxiptsNB,noNGB), vhNGBp(maxiptsNB,noNGB), &
                 scNGB(maxiptsNB,noNGB), scNGBp(maxiptsNB,noNGB), &
@@ -160,7 +160,7 @@ SUBROUTINE openbc0
                 arNGB(maxiptsNB,noNGB), arNGBp(maxiptsNB,noNGB), &
                 STAT=istat)
      IF (istat /= 0) CALL allocate_error ( istat, 31 )
-     ALLOCATE ( kNGB (maxiptsNB,noNGB), & 
+     ALLOCATE ( kNGB (maxiptsNB,noNGB), &
                 iNGB (maxiptsNB,noNGB), &
                 jNGB (maxiptsNB,noNGB), STAT=istat)
      IF (istat /= 0) CALL allocate_error ( istat, 32 )
@@ -201,7 +201,7 @@ SUBROUTINE openbc0
        nbiid = nbiid0 + nn;
        niNGB = niNGB  + 1 ;
 
-       ! ... Allocate space for temporary input variable array 
+       ! ... Allocate space for temporary input variable array
        ALLOCATE( inputvar ( iptNBI(nn), 11+ntr ), STAT=istat )
        IF (istat /= 0) CALL allocate_error (istat,34)
        print *,"openbc16"
@@ -217,7 +217,7 @@ SUBROUTINE openbc0
            jNGB  (icl,niNGB) = inputvar(icl,2)
            kNGB  (icl,niNGB) = inputvar(icl,3)
            uhNGBp(icl,niNGB) = inputvar(icl,4)
-           scNGBp(icl,niNGB) = inputvar(icl,5) 
+           scNGBp(icl,niNGB) = inputvar(icl,5)
            vhNGBp(icl,niNGB) = inputvar(icl,6) !MAC NESTING
            sNGBp(icl,niNGB) = inputvar(icl,7)  !MAC NESTING
            huNGBp(icl,niNGB) = inputvar(icl,8) !MAC NESTING
@@ -226,7 +226,7 @@ SUBROUTINE openbc0
            arNGBp(icl,niNGB) = inputvar(icl,11)  !MAC NESTING
 
            IF (ntr > 0) THEN
-             trNGBp(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr) 
+             trNGBp(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr)
            ENDIF
          ENDDO
        CASE(2,4)
@@ -235,7 +235,7 @@ SUBROUTINE openbc0
            jNGB  (icl,niNGB) = inputvar(icl,2)
            kNGB  (icl,niNGB) = inputvar(icl,3)
            vhNGBp(icl,niNGB) = inputvar(icl,4)
-           scNGBp(icl,niNGB) = inputvar(icl,5) 
+           scNGBp(icl,niNGB) = inputvar(icl,5)
            uhNGBp(icl,niNGB) = inputvar(icl,6) !MAC NESTING
            sNGBp(icl,niNGB) = inputvar(icl,7)  !MAC NESTING
            huNGBp(icl,niNGB) = inputvar(icl,8) !MAC NESTING
@@ -243,7 +243,7 @@ SUBROUTINE openbc0
            agNGBp(icl,niNGB) = inputvar(icl,10) !MAC NESTING
            arNGBp(icl,niNGB) = inputvar(icl,11)  !MAC NESTING
            IF (ntr > 0) THEN
-             trNGBp(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr) 
+             trNGBp(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr)
            ENDIF
          ENDDO
        END SELECT
@@ -253,17 +253,17 @@ SUBROUTINE openbc0
        ! ... Check grid size for consistency between coarse & fine grid .........
        SELECT CASE (iside(nn))
        CASE(1,3)
-         i   = isbc(nn); 
-         js  = jsbc(nn); 
+         i   = isbc(nn);
+         js  = jsbc(nn);
          je  = jebc(nn);
          icl = 0
 
-         
- 
+
+
          DO j = js, je
            DO k = k1, kmz(ij2l(i,j))
-             icl = icl + 1      
-             
+             icl = icl + 1
+
              IF(kNGB(icl,niNGB) .NE. k) THEN
                 PRINT *, '******************************************************'
                 PRINT *, 'STOOOP - Coarse & fine grids numbering NOT CONSISTENT'
@@ -288,13 +288,13 @@ SUBROUTINE openbc0
          ENDIF
 
        CASE(2,4)
-         j   = jsbc(nn); 
-         is  = isbc(nn); 
+         j   = jsbc(nn);
+         is  = isbc(nn);
          ie  = iebc(nn);
          icl = 0
          DO i = is, ie
            DO k = k1, kmz(ij2l(i,j))
-             icl = icl + 1      
+             icl = icl + 1
              IF(kNGB(icl,niNGB) .NE. k) THEN
                 PRINT *, '******************************************************'
                 PRINT *, 'STOP - Coarse & fine grids numbering NOT CONSISTENT'
@@ -318,17 +318,17 @@ SUBROUTINE openbc0
            STOP
          ENDIF
 
-       END SELECT      
+       END SELECT
        print *,"tttantes:",thrsNGB(nn)
        ! ... Read SECOND FRAME & store variables ...............................
-       !READ(nbiid) thrsNGB(nn), & 
+       !READ(nbiid) thrsNGB(nn), &
        !          ((inputvar(m1,m2),m2=4,11+ntr),m1=1,iptNBI(nn))
        !print *,"ttt:",thrsNGB(nn)
        !SELECT CASE (iside(nn))
        !CASE(1,3)
        !  DO icl = 1, iptNBI(nn)
        !    uhNGB(icl,niNGB) = inputvar(icl,4)
-       !    scNGB(icl,niNGB) = inputvar(icl,5) 
+       !    scNGB(icl,niNGB) = inputvar(icl,5)
        !    vhNGB(icl,niNGB) = inputvar(icl,6) !MAC NESTING
        !    sNGB(icl,niNGB) = inputvar(icl,7)  !MAC NESTING
        !    huNGB(icl,niNGB) = inputvar(icl,8) !MAC NESTING
@@ -336,7 +336,7 @@ SUBROUTINE openbc0
        !    agNGB(icl,niNGB) = inputvar(icl,10) !MAC NESTING
        !    arNGB(icl,niNGB) = inputvar(icl,11)  !MAC NESTING
        !    IF (ntr > 0) THEN
-       !      trNGB(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr) 
+       !      trNGB(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr)
        !    ENDIF
        !  ENDDO
        !CASE(2,4)
@@ -350,7 +350,7 @@ SUBROUTINE openbc0
        !    agNGB(icl,niNGB) = inputvar(icl,10) !MAC NESTING
        !    arNGB(icl,niNGB) = inputvar(icl,11)  !MAC NESTING
        !    IF (ntr > 0) THEN
-       !      trNGB(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr) 
+       !      trNGB(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr)
        !    ENDIF
        !  ENDDO
        !END SELECT
@@ -359,7 +359,7 @@ SUBROUTINE openbc0
 !       print *,"uhNGB:",sum(uhNGB(:,:)),"vhNGB:",sum(vhNGB(:,:)),"scNGB:",sum(scNGB(:,:))
      ENDDO
 
-   ENDIF         
+   ENDIF
 
    !           -----Assign boundary values at time t=0.0-----
 
@@ -386,16 +386,16 @@ SUBROUTINE openbc0
    DO nn = 1, nopen
 
       SELECT CASE ( itype(nn) )
- 
+
       ! ..... CASE 1 -- wse specified ......................................
       CASE (1)
 
          ! Get first boundary value of zeta & make sure the i,j locations
-         ! are wett boundary cells (Assume first value applies for t=0.0. 
-         ! It should be consistent with the initial condition for zeta 
+         ! are wett boundary cells (Assume first value applies for t=0.0.
+         ! It should be consistent with the initial condition for zeta
          ! defined in SUBROUTINE init)
          sbc = varsOpenBC(nn,1,1);
-        
+
          ! Identify wse boundary as on the west, north, east, or south
          SELECT CASE ( iside(nn) )
 
@@ -404,26 +404,26 @@ SUBROUTINE openbc0
 
             ! ... Retrieve (i,j) index where BC is specified
             i = isbc(nn); js = jsbc(nn); je = jebc(nn)
-            
-            
+
+
             ! ... Make sure i,j locations are wett boundary cells
-            DO j = js, je   
+            DO j = js, je
               laux=ij2l(i,j)
               ! ... Assign boundary condition
               sp(laux) = sbc
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i-1,j) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - West bdry. not a bdry. point"
-                STOP 
+                STOP
               END IF
 
               nwlayers = (kmz(laux) - k1z(laux)) + 1
               IF(nwlayers <= 0) THEN  ! dry point on boundary is not allowed
-                PRINT *, " ERROR--dry point on west boundary" 
+                PRINT *, " ERROR--dry point on west boundary"
                 PRINT *, "  "
                 PRINT *, "  "
                 PRINT *, " ****STOPPING si3d for boundary condition error"
-                STOP 
+                STOP
               END IF
             END DO
 
@@ -432,24 +432,24 @@ SUBROUTINE openbc0
 
             ! ... Retrieve (i,j) index where BC is specified
             j = jsbc(nn); is = isbc(nn); ie = iebc(nn)
-            
+
             ! ... Make sure i,j locations are wett boundary cells
-            DO i = is, ie   
+            DO i = is, ie
               laux=ij2l(i,j)
               ! ... Assign boundary condition
               sp(laux) = sbc
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j+1) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - North bdry. not a bdry. point"
-                STOP 
+                STOP
               ENDIF
               nwlayers = (kmz(laux) - k1z(laux)) + 1
               IF (nwlayers < 1) THEN  ! dry point on boundary is not allowed
-                PRINT *, " ERROR--dry point on north boundary" 
+                PRINT *, " ERROR--dry point on north boundary"
                 PRINT *, "  "
                 PRINT *, "  "
                 PRINT *, " ****STOPPING si3d for boundary condition error"
-                STOP 
+                STOP
               ENDIF
             END DO
 
@@ -458,21 +458,21 @@ SUBROUTINE openbc0
 
             ! ... Retrieve (i,j) index where BC is specified
             i = isbc(nn); js = jsbc(nn); je = jebc(nn)
-            
+
             ! ... Make sure i,j locations are wett boundary cells
-            DO j = js, je   
+            DO j = js, je
               laux=ij2l(i,j)
               ! ... Assign boundary condition
               sp(laux) = sbc
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i+1,j) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - East bdry. not a bdry. point"
-                STOP 
+                STOP
               ENDIF
               nwlayers = (kmz(laux) - k1z(laux)) + 1
               IF ( nwlayers < 1) THEN ! dry point on boundary is not allowed
 
-                PRINT *, " ERROR--dry point on east boundary" 
+                PRINT *, " ERROR--dry point on east boundary"
 
 
 
@@ -480,7 +480,7 @@ SUBROUTINE openbc0
                 PRINT *, "  "
                 PRINT *, "  "
                 PRINT *, " ****STOPPING si3d for boundary condition error"
-                STOP 
+                STOP
               ENDIF
             ENDDO
 
@@ -489,32 +489,32 @@ SUBROUTINE openbc0
 
             ! ... Retrieve (i,j) index where BC is specified
             j = jsbc(nn); is = isbc(nn); ie = iebc(nn)
-            
+
             ! ... Make sure i,j locations are wett boundary cells
-            DO i = is, ie 
+            DO i = is, ie
               laux=ij2l(i,j)
               ! ... Assign boundary condition
               sp(laux) = sbc
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j-1) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - South bdry. not a bdry. point"
-                STOP 
+                STOP
               ENDIF
               nwlayers = (kmz(laux) - k1z(laux)) + 1
               IF (nwlayers < 1) THEN ! dry point on boundary is not allowed
-                PRINT *, " ERROR--dry point on south boundary" 
+                PRINT *, " ERROR--dry point on south boundary"
                 PRINT *, "  "
                 PRINT *, "  "
                 PRINT *, " ****STOPPING si3d for boundary condition error"
-                STOP 
+                STOP
               ENDIF
-            END DO 
+            END DO
 
          END SELECT
 
       !..... CASE 2 -- Free surface flow specified .........................
       CASE (2)
-      
+
          ! Get first boundary value of flow (in units of m**3/sec)
          ! (Assume first value applies for t=0.0. It should be consistent
          !  with the initial condition for uh, vh, u,and v)
@@ -525,12 +525,12 @@ SUBROUTINE openbc0
 
          ! West boundary
          CASE (1)
- 
+
             ! Get i-, j- indexes for bdry. point
             i = isbc(nn); js = jsbc(nn); je = jebc(nn)
 
             ! Make sure i,j locations are wett boundary cells
-            DO j = js, je   
+            DO j = js, je
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i-1,j) ) THEN
                  PRINT *, "  "
                  PRINT *, " ****STOPPING - West bdry. not a bdry. point"
@@ -539,7 +539,7 @@ SUBROUTINE openbc0
             ENDDO
 
             ! Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO j = js,je
               laux=ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -575,11 +575,11 @@ SUBROUTINE openbc0
 
          ! East boundary
          CASE (3)
- 
+
             ! ... Get i-, j- indexes for bdry. point
             i = isbc(nn); js = jsbc(nn); je = jebc(nn)
             ! ... Make sure i,j locations are wett boundary cells
-            DO j = js, je   
+            DO j = js, je
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i+1,j) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - East bdry. not a bdry. point"
@@ -587,7 +587,7 @@ SUBROUTINE openbc0
               END IF
             ENDDO
             ! ... Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO j = js,je
               laux=ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -614,23 +614,23 @@ SUBROUTINE openbc0
                  uhEB(k,j) = uavg * huEB(k,j)
               END DO
             ENDDO
-            
+
 
          ! North boundary
          CASE (2)
- 
+
             ! ... Get i-, j- indexes for bdry. point
             j = jsbc(nn); is = isbc(nn); ie = iebc(nn)
             ! ... Make sure i,j locations are wett boundary cells
-            DO i = is, ie   
+            DO i = is, ie
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j+1) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - North bdry. not a bdry. point"
-                STOP 
+                STOP
               END IF
             ENDDO
             ! ... Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO i = is,ie
               laux=ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -661,19 +661,19 @@ SUBROUTINE openbc0
 
          ! South boundary
          CASE (4)
- 
+
             ! ... Get i-, j- indexes for bdry. point
             j = jsbc(nn); is = isbc(nn); ie = iebc(nn)
             ! ... Make sure i,j locations are wett boundary cells
-            DO i = is, ie   
+            DO i = is, ie
               IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j-1) ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - South bdry. not a bdry. point"
-                STOP 
+                STOP
               END IF
             ENDDO
             ! ... Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO i = is,ie
               laux=ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -701,11 +701,11 @@ SUBROUTINE openbc0
               END DO
             ENDDO
 
-         END SELECT         
+         END SELECT
 
       !..... CASE 3 -- Submerged flow specified.............................
       CASE (3)
-      
+
          ! Get first boundary value of flow (in units of m**3/sec)
          ! (Assume first value applies for t=0.0. It should be consistent
          !  with the initial condition for uh, vh, u,and v)
@@ -716,13 +716,13 @@ SUBROUTINE openbc0
 
          ! West boundary
          CASE (1)
- 
+
             ! ... Get i-, j- indexes for bdry. point
-            i  = isbc(nn); 
-            j  = jsbc(nn); 
+            i  = isbc(nn);
+            j  = jsbc(nn);
             l  = ij2l(i,j)
-            ks = iebc(nn); 
-            ke = jebc(nn); 
+            ks = iebc(nn);
+            ke = jebc(nn);
             ! ... Make sure i,j locations are wett boundary cells
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i-1,j) ) THEN
               PRINT *, "  "
@@ -733,8 +733,8 @@ SUBROUTINE openbc0
             !     & total area for outflow-inflow section
             areatot = 0.0
             DO k = ks, ke
-              huWB (k,j)= hp(k,l) 
-              IF ( huWB(k,j) <= ZERO ) THEN 
+              huWB (k,j)= hp(k,l)
+              IF ( huWB(k,j) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Spec. West bdry. below free surface"
                 STOP
@@ -743,20 +743,20 @@ SUBROUTINE openbc0
             ENDDO
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            uavg = qbc/areatot; 
+            uavg = qbc/areatot;
             DO k = ks, ke
               uhWB(k,j) = uavg * huWB(k,j)
             ENDDO
 
          ! East boundary
          CASE (3)
- 
+
             ! ... Get i-, j- indexes for bdry. point
-            i  = isbc(nn); 
-            j  = jsbc(nn); 
+            i  = isbc(nn);
+            j  = jsbc(nn);
             l  = ij2l(i,j)
-            ks = iebc(nn); 
-            ke = jebc(nn); 
+            ks = iebc(nn);
+            ke = jebc(nn);
 
             ! ... Make sure i,j locations are wett boundary cells
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i+1,j) ) THEN
@@ -768,8 +768,8 @@ SUBROUTINE openbc0
             !     & total area for outflow-inflow section
             areatot = 0.0
             DO k = ks, ke
-              huEB (k,j)= hp(k,l) 
-              IF ( huEB(k,j) <= ZERO ) THEN 
+              huEB (k,j)= hp(k,l)
+              IF ( huEB(k,j) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - East bdry. below free surface"
                 STOP
@@ -778,32 +778,32 @@ SUBROUTINE openbc0
             ENDDO
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            uavg = qbc/areatot; 
+            uavg = qbc/areatot;
             DO k = ks, ke
               uhEB(k,j) = uavg * huEB(k,j)
             ENDDO
 
          ! North boundary
          CASE (2)
- 
+
             ! ... Get i-, j- indexes for bdry. point
-            j  = jsbc(nn); 
+            j  = jsbc(nn);
             i  = isbc(nn);
-            l  = ij2l(i,j) 
+            l  = ij2l(i,j)
             ks = iebc(nn);
             ke = jebc(nn);
             ! ... Make sure i,j locations are wett boundary cells
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j+1) ) THEN
               PRINT *, "  "
               PRINT *, " ****STOPPING - North bdry. not a bdry. point"
-              STOP 
+              STOP
             END IF
             ! ... Make sure k- location is wett, define thickness of bdry. cell
             !     & total area for outflow-inflow section
             areatot = 0.0
             DO k = ks, ke
-              hvNB (k,i)= hp(k,l) 
-              IF ( hvNB(k,i) <= ZERO ) THEN 
+              hvNB (k,i)= hp(k,l)
+              IF ( hvNB(k,i) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Submerged North bdry. on a DRY CELL"
                 STOP
@@ -812,32 +812,32 @@ SUBROUTINE openbc0
             ENDDO
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            vavg = qbc/areatot; 
+            vavg = qbc/areatot;
             DO k = ks, ke
               vhNB(k,i) = vavg * hvNB(k,i)
             ENDDO
 
          ! South boundary
          CASE (4)
- 
+
             ! ... Get i-, j- indexes for bdry. point
-            j  = jsbc(nn); 
+            j  = jsbc(nn);
             i  = isbc(nn);
-            l  = ij2l(i,j) 
+            l  = ij2l(i,j)
             ks = iebc(nn);
             ke = jebc(nn);
             ! ... Make sure i,j locations are wett boundary cells
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j-1) ) THEN
               PRINT *, "  "
               PRINT *, " ****STOPPING - South bdry. not a bdry. point"
-              STOP 
+              STOP
             END IF
             ! ... Make sure k- location is wett, define thickness of bdry. cell
             !     & total area for outflow-inflow section
             areatot = 0.0
             DO k = ks, ke
-              hvSB (k,i)= hp(k,l) 
-              IF ( hvSB(k,i) <= ZERO ) THEN 
+              hvSB (k,i)= hp(k,l)
+              IF ( hvSB(k,i) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Submerged South bdry. on a DRY CELL"
                 STOP
@@ -847,7 +847,7 @@ SUBROUTINE openbc0
 
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            vavg = qbc/areatot; 
+            vavg = qbc/areatot;
             DO k = ks, ke
               vhSB(k,i) = vavg * hvSB(k,i)
             ENDDO
@@ -860,11 +860,11 @@ SUBROUTINE openbc0
         niNGB = niNGB + 1;
         SELECT CASE (iside(nn))
         CASE(1)
-          i   = isbc(nn); 
-          js  = jsbc(nn); 
+          i   = isbc(nn);
+          js  = jsbc(nn);
           je  = jebc(nn);
           icl = 0
-          DO j = js, je; 
+          DO j = js, je;
             l   = ij2l(i,j)
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i-1,j) ) THEN
               PRINT *, "  "
@@ -872,7 +872,7 @@ SUBROUTINE openbc0
               STOP
             END IF
             DO k = k1, kmz(l) !MAC NESTING
-              icl = icl + 1      
+              icl = icl + 1
               uhWB(k,j) = uhNGBp(icl,niNGB)
               huWB(k,j) = huNGBp(icl,niNGB)
               !huWB(k,j) = hup(k,l)
@@ -887,18 +887,18 @@ SUBROUTINE openbc0
               !else
               !     aux = sWBp(k,j+1)
               !endif
-               
+
               !auxhWB(k,j)= AMIN1(zlevel(k+1),hhv(l)) -            &
               !     &        AMAX1(zlevel(  k),-MAX(sWBp(k,j),aux))
-               
-            ENDDO 
-          ENDDO 
+
+            ENDDO
+          ENDDO
         CASE(3)
-          i   = isbc(nn); 
-          js  = jsbc(nn); 
+          i   = isbc(nn);
+          js  = jsbc(nn);
           je  = jebc(nn);
           icl = 0
-          DO j = js, je; 
+          DO j = js, je;
             l  = ij2l(i,j)
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i+1,j) ) THEN
               PRINT *, "  "
@@ -906,7 +906,7 @@ SUBROUTINE openbc0
               STOP
             END IF
             DO k = k1, kmz(l)   !MAC NESTING
-              icl = icl + 1      
+              icl = icl + 1
               uhEB(k,j) = uhNGBp(icl,niNGB)
               huEB(k,j) = huNGBp(icl,niNGB)
               !huEB(k,j) = AMIN1(zlevel(k+1),hhu(l)) -            &
@@ -920,11 +920,11 @@ SUBROUTINE openbc0
             ENDDO
           ENDDO
         CASE(2)
-          j   = jsbc(nn); 
-          is  = isbc(nn); 
+          j   = jsbc(nn);
+          is  = isbc(nn);
           ie  = iebc(nn);
           icl = 0
-          DO i = is, ie; 
+          DO i = is, ie;
             l  = ij2l(i,j)
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j+1) ) THEN
               PRINT *, "  "
@@ -932,7 +932,7 @@ SUBROUTINE openbc0
               STOP
             END IF
             DO k = k1, kmz(l)  !MAC NESTING
-              icl = icl + 1      
+              icl = icl + 1
               vhNB(k,i) = vhNGBp(icl,niNGB)
               hvNB(k,i) = hvNGBp(icl,niNGB)
               !hvNB(k,i) = AMIN1(zlevel(k+1),hhu(l)) -            &
@@ -953,11 +953,11 @@ SUBROUTINE openbc0
             ENDDO
           ENDDO
         CASE(4)
-          j   = jsbc(nn); 
-          is  = isbc(nn); 
+          j   = jsbc(nn);
+          is  = isbc(nn);
           ie  = iebc(nn);
           icl = 0
-          DO i = is, ie; 
+          DO i = is, ie;
             l  = ij2l(i,j)
             IF ( (.NOT. mask2d(i,j)) .OR. mask2d(i,j-1) ) THEN
               PRINT *, "  "
@@ -965,7 +965,7 @@ SUBROUTINE openbc0
               STOP
             END IF
             DO k = k1, kmz(l)
-              icl = icl + 1       
+              icl = icl + 1
               vhSB(k,i) = vhNGBp(icl,niNGB)
               hvSB(k,i) = hvNGBp(icl,niNGB)
               !hvSB(k,i) = hvp(k,l)
@@ -984,8 +984,8 @@ SUBROUTINE openbc0
               !     &       AMAX1(zlevel(  k),-MAX(sSBp(k,i),aux))
             ENDDO
           ENDDO
-        END SELECT   
-          
+        END SELECT
+
       END SELECT
 !      print *,"uhWB:",sum(uhWB(:,:)),"huWB:",sum(huWB(:,:))
    END DO
@@ -1003,7 +1003,7 @@ SUBROUTINE openbc0
    sWBp   = sWB  ; sEBp   = sEB  ;
    sNBpp  = sNBp ; sSBpp  = sSBp ;  !MAC NESTING
    sWBpp  = sWBp ; sEBpp  = sEBp ;
-   
+
 
    uhNBp  = uhNB ; huNBp  = huNB ;
    uhSBp  = uhSB ; huSBp  = huSB ;
@@ -1017,7 +1017,7 @@ SUBROUTINE openbc0
    auxhWBp   = auxhWB  ; auxhEBp   = auxhEB  ;
    auxhNBpp  = auxhNBp ; auxhSBpp  = auxhSBp ;  !MAC NESTING
    auxhWBpp  = auxhWBp ; auxhEBpp  = auxhEBp ;
-   
+
 
 
 END SUBROUTINE openbc0
@@ -1027,7 +1027,7 @@ SUBROUTINE openbcUVH(thrs)
 !************************************************************************
 !
 !  Purpose: To assign values of water surface elevation or velocity
-!           along open boundaries at the new (n+1) time level. 
+!           along open boundaries at the new (n+1) time level.
 !
 !------------------------------------------------------------------------
 
@@ -1043,7 +1043,7 @@ SUBROUTINE openbcUVH(thrs)
    ide_t = omp_get_thread_num()+1
    ! ... Return if no open boundaries exist
    IF (nopenH(ide_t) <= 0) RETURN
-   
+
    ! ... Initialize to zero counter for nested grid boundaries
    niNGB = 0;
 
@@ -1051,7 +1051,7 @@ SUBROUTINE openbcUVH(thrs)
    DO nn = 1, nopenHH(ide_t)
       no = noh2noH(nn,ide_t)
       SELECT CASE ( itype(no) )
- 
+
       !.....Case 1 -- wse specified.......................................
       CASE (1)
 
@@ -1061,48 +1061,48 @@ SUBROUTINE openbcUVH(thrs)
 
          ! Identify wse boundary as on the west, north, east, or south
          SELECT CASE ( iside(no) )
- 
+
          ! West boundary
          CASE (1)
-            i  = isbcHH(no,ide_t); 
-            js = jsbcH(no,ide_t); 
+            i  = isbcHH(no,ide_t);
+            js = jsbcH(no,ide_t);
             je = jebcH(no,ide_t)
             DO jaux=js,je
             	s(ij2l(i,jaux)) = sbc
             END DO
-            
+
          ! North boundary
          CASE (2)
-            j  = jsbcH(no,ide_t); 
-            is = isbcHH(no,ide_t); 
+            j  = jsbcH(no,ide_t);
+            is = isbcHH(no,ide_t);
             ie = iebcHH(no,ide_t)
             DO iaux=is,ie
             	s(ij2l(iaux,j)) = sbc
             END DO
-            
+
          ! East boundary
          CASE (3)
-            i  = isbcHH(no,ide_t); 
-            js = jsbcH(no,ide_t); 
+            i  = isbcHH(no,ide_t);
+            js = jsbcH(no,ide_t);
             je = jebcH(no,ide_t)
             DO jaux=js,je
             	s(ij2l(i,jaux)) = sbc
             END DO
-            
-         ! South boundary              
+
+         ! South boundary
          CASE (4)
-            j  = jsbcH(no,ide_t); 
-            is = isbcHH(no,ide_t);  
-            ie = iebcHH(no,ide_t)          
+            j  = jsbcH(no,ide_t);
+            is = isbcHH(no,ide_t);
+            ie = iebcHH(no,ide_t)
             DO iaux=is,ie
             	s(ij2l(iaux,j)) = sbc
             END DO
-            
+
          END SELECT
 
       !.....Case 2 -- Free surface flow specified........................
       CASE (2)
-      
+
          ! Get new boundary value of flow (in units of m**3/sec) (NewOpenBC)
          dthrs_flw = dtsecOpenBC/3600.
          qbc = parab(0.,thrs,varsOpenBC(no,1,:),dthrs_flw)
@@ -1112,14 +1112,14 @@ SUBROUTINE openbcUVH(thrs)
 
          ! West boundary
          CASE (1)
- 
+
             ! Get i-, j- indexes for bdry. point
-            i  = isbcH(no,ide_t); 
-            js = jsbcH(no,ide_t); 
+            i  = isbcH(no,ide_t);
+            js = jsbcH(no,ide_t);
             je = jebcH(no,ide_t)
 
             ! Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO j = js,je
               laux = ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -1150,20 +1150,20 @@ SUBROUTINE openbcUVH(thrs)
               kmx = kmz(ij2l(i,j))
               DO k = k1, kmx
                  uhWB(k,j) = uavg * huWB(k,j)
-				 
+
               END DO
             ENDDO
 
          ! East boundary
          CASE (3)
- 
+
             ! Get i-, j- indexes for bdry. point
-            i  = isbcH(no,ide_t); 
-            js = jsbcH(no,ide_t); 
+            i  = isbcH(no,ide_t);
+            js = jsbcH(no,ide_t);
             je = jebcH(no,ide_t);
 
             ! Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO j = js,je
               laux = ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -1197,14 +1197,14 @@ SUBROUTINE openbcUVH(thrs)
 
          ! North boundary
          CASE (2)
- 
+
             ! Get i-, j- indexes for bdry. point
-            j  = jsbcH(no,ide_t); 
-            is = isbcH(no,ide_t); 
+            j  = jsbcH(no,ide_t);
+            is = isbcH(no,ide_t);
             ie = iebcH(no,ide_t)
 
             ! Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO i = is,ie
               laux = ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -1216,10 +1216,10 @@ SUBROUTINE openbcUVH(thrs)
             ! ... Define thickness of bdry. wet cells & total area
             !$omp critical
             if(flag(no) .EQ. 0) THEN
-                areatot(no) = 0.0; 
+                areatot(no) = 0.0;
                 flag(no) = 1
             end if
-                
+
             !$omp end critical
             !hvNB(:,is:ie) = ZERO
             DO i = is,ie
@@ -1241,7 +1241,7 @@ SUBROUTINE openbcUVH(thrs)
 
             end do
             flag(no) = 0
-            cont(no) = 0 
+            cont(no) = 0
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
             vavg = qbc/areatot(no); vhNB(:,is:ie) = 0.0E0
@@ -1254,14 +1254,14 @@ SUBROUTINE openbcUVH(thrs)
 
          ! South boundary
          CASE (4)
- 
+
             ! Get i-, j- indexes for bdry. point
-            j  = jsbcH(no,ide_t); 
-            is = isbcH(no,ide_t); 
+            j  = jsbcH(no,ide_t);
+            is = isbcH(no,ide_t);
             ie = iebcH(no,ide_t)
 
             ! Get max. depth in section with bdry. values specified
-            hbc = -1.e6; 
+            hbc = -1.e6;
             DO i = is,ie
               laux = ij2l(i,j)
               IF(hhs(laux)>hbc) hbc = hhs(laux)
@@ -1273,10 +1273,10 @@ SUBROUTINE openbcUVH(thrs)
             ! ... Define thickness of bdry. wet cells & total area
             !$omp critical
             if(flag(no) .EQ. 0) THEN
-                areatot(no) = 0.0; 
+                areatot(no) = 0.0;
                 flag(no) = 1
             end if
-                
+
             !$omp end critical
             !hvSB(:,is:ie) = ZERO
             DO i = is,ie
@@ -1298,7 +1298,7 @@ SUBROUTINE openbcUVH(thrs)
 
             end do
             flag(no) = 0
-            cont(no) = 0 
+            cont(no) = 0
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
             vavg = qbc/areatot(no); vhSB(:,is:ie) = 0.0E0
@@ -1325,20 +1325,20 @@ SUBROUTINE openbcUVH(thrs)
 
          ! West boundary
          CASE (1)
- 
+
             ! Get i-, j- indexes for bdry. point
-            i  = isbc(no); 
-            j  = jsbc(no); 
+            i  = isbc(no);
+            j  = jsbc(no);
             l  = ij2l(i,j)
-            ks = iebc(no); 
-            ke = jebc(no); 
+            ks = iebc(no);
+            ke = jebc(no);
 
             ! Make sure k- location is wett, define thickness of bdry. cell
             ! & total area for outflow-inflow section
             areatotal = 0.0
             DO k = ks, ke
-              huWB (k,j)= hp(k,l) 
-              IF ( huWB(k,j) <= ZERO ) THEN 
+              huWB (k,j)= hp(k,l)
+              IF ( huWB(k,j) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Submerged West bdry. on DRY CELL"
                 STOP
@@ -1348,27 +1348,27 @@ SUBROUTINE openbcUVH(thrs)
 
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            uavg = qbc/areatotal; 
+            uavg = qbc/areatotal;
             DO k = ks, ke
-              uhWB(k,j) = uavg * huWB(k,j)       
+              uhWB(k,j) = uavg * huWB(k,j)
             ENDDO
 
          ! East boundary
          CASE (3)
- 
+
             ! Get i-, j- indexes for bdry. point
-            i  = isbc(no); 
-            j  = jsbc(no); 
+            i  = isbc(no);
+            j  = jsbc(no);
             l  = ij2l(i,j)
-            ks = iebc(no); 
-            ke = jebc(no); 
+            ks = iebc(no);
+            ke = jebc(no);
 
             ! Make sure k- location is wett, define thickness of bdry. cell
             ! & total area for outflow-inflow section
             areatotal = 0.0
             DO k = ks, ke
-              huEB (k,j)= hp(k,l) 
-              IF ( huEB(k,j) <= ZERO ) THEN 
+              huEB (k,j)= hp(k,l)
+              IF ( huEB(k,j) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Submerged East bdry. on DRY CELL"
                 STOP
@@ -1378,18 +1378,18 @@ SUBROUTINE openbcUVH(thrs)
 
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            uavg = qbc/areatotal; 
+            uavg = qbc/areatotal;
             DO k = ks, ke
               uhEB(k,j) = uavg * huEB(k,j)
             ENDDO
 
          ! North boundary
          CASE (2)
- 
+
             ! Get i-, j- indexes for bdry. point
-            j  = jsbc(no); 
+            j  = jsbc(no);
             i  = isbc(no);
-            l  = ij2l(i,j) 
+            l  = ij2l(i,j)
             ks = iebc(no);
             ke = jebc(no);
 
@@ -1397,8 +1397,8 @@ SUBROUTINE openbcUVH(thrs)
             ! & total area for outflow-inflow section
             areatotal = 0.0
             DO k = ks, ke
-              hvNB (k,i)= hp(k,l) 
-              IF ( hvNB(k,i) <= ZERO ) THEN 
+              hvNB (k,i)= hp(k,l)
+              IF ( hvNB(k,i) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Submerged North bdry. on a DRY CELL"
                 STOP
@@ -1408,18 +1408,18 @@ SUBROUTINE openbcUVH(thrs)
 
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            vavg = qbc/areatotal; 
+            vavg = qbc/areatotal;
             DO k = ks, ke
               vhNB(k,i) = vavg * hvNB(k,i)
             ENDDO
 
          ! South boundary
          CASE (4)
- 
+
             ! Get i-, j- indexes for bdry. point
-            j  = jsbc(no); 
+            j  = jsbc(no);
             i  = isbc(no);
-            l  = ij2l(i,j) 
+            l  = ij2l(i,j)
             ks = iebc(no);
             ke = jebc(no);
 
@@ -1427,8 +1427,8 @@ SUBROUTINE openbcUVH(thrs)
             ! & total area for outflow-inflow section
             areatotal = 0.0
             DO k = ks, ke
-              hvSB (k,i)= hp(k,l) 
-              IF ( hvSB(k,i) <= ZERO ) THEN 
+              hvSB (k,i)= hp(k,l)
+              IF ( hvSB(k,i) <= ZERO ) THEN
                 PRINT *, "  "
                 PRINT *, " ****STOPPING - Submerged South bdry. on a DRY CELL"
                 STOP
@@ -1438,20 +1438,20 @@ SUBROUTINE openbcUVH(thrs)
 
             ! ... Define xs average velocity and estimate uh from there
             !     assuming velocity is uniform over xs
-            vavg = qbc/areatotal; 
+            vavg = qbc/areatotal;
             DO k = ks, ke
               vhSB(k,i) = vavg * hvSB(k,i)
             ENDDO
 
-         END SELECT    
+         END SELECT
 
       !.....Case 4 -- Nested grid boundaries specified ..................
       CASE (4)
-      
+
          ! ... Update counter of nested grid boundaries
          niNGB = niNGB + 1;
 
-         ! ... Define weighting coefficients for records 
+         ! ... Define weighting coefficients for records
          !weight  = (thrs - thrsNGBp(no))/(thrsNGB(no)-thrsNGBp(no))
           weight  = 1.0
 !         print *,"niNGB:",niNGB,"thrs",thrs,"thrsNGBp:",thrsNGBp
@@ -1459,16 +1459,16 @@ SUBROUTINE openbcUVH(thrs)
          ! Identify boundary as on the west, north, east, or south
          SELECT CASE (iside(no))
          CASE(1)
-           i   = isbcH(no,ide_t); 
-           js  = jsbcH(no,ide_t); 
+           i   = isbcH(no,ide_t);
+           js  = jsbcH(no,ide_t);
            je  = jebcH(no,ide_t);
            icl = 0
            DO j = js, je;
-             l = ij2l(i,j) 
+             l = ij2l(i,j)
              DO k = k1, kmz(l)
-               icl = icl + 1    
+               icl = icl + 1
                sWB (k,j) = sNGB (icl,no)*    weight + &
-                           sNGBp(icl,no)*(1.-weight)  
+                           sNGBp(icl,no)*(1.-weight)
                uhWB(k,j) = uhNGB (icl,no)*    weight + &
                            uhNGBp(icl,no)*(1.-weight)
                huWB(k,j)=  huNGB (icl,no)*    weight + &
@@ -1481,26 +1481,26 @@ SUBROUTINE openbcUVH(thrs)
                !endif
                auxhWB(k,j)= hvNGB (icl,no)*    weight + &
                             hvNGBp(icl,no)*(1.-weight)
-               
+
                vhWB(k,j) = vhNGB (icl,no)*    weight + &
                            vhNGBp(icl,no)*(1.-weight)
                hvWB(k,j) = hv(k,l)
                agWB(k,j) = agNGB(icl,no)
                arWB(k,j) = arNGB(icl,no)
                !hvWB(k,j) = hv(k,l)
-             ENDDO 
-           ENDDO 
+             ENDDO
+           ENDDO
          CASE(3)
-           i   = isbcH(no,ide_t); 
-           js  = jsbcH(no,ide_t); 
+           i   = isbcH(no,ide_t);
+           js  = jsbcH(no,ide_t);
            je  = jebcH(no,ide_t);
            icl = 0
-           DO j = js, je; 
-             l = ij2l(i,j) 
+           DO j = js, je;
+             l = ij2l(i,j)
              DO k = k1, kmz(l)
-               icl = icl + 1      
+               icl = icl + 1
                sEB (k,j) = sNGB (icl,no)*    weight + &
-                           sNGBp(icl,no)*(1.-weight)  
+                           sNGBp(icl,no)*(1.-weight)
                uhEB(k,j) = uhNGB (icl,no)*    weight + &
                            uhNGBp(icl,no)*(1.-weight)
                huEB(k,j) = huNGB (icl,no)*    weight + &
@@ -1523,16 +1523,16 @@ SUBROUTINE openbcUVH(thrs)
              ENDDO
            ENDDO
          CASE(2)
-           j   = jsbcH(no,ide_t); 
-           is  = isbcH(no,ide_t); 
+           j   = jsbcH(no,ide_t);
+           is  = isbcH(no,ide_t);
            ie  = iebcH(no,ide_t);
            icl = siptNBI(no,ide_t) -1
-           DO i = is, ie; 
-             l = ij2l(i,j) 
+           DO i = is, ie;
+             l = ij2l(i,j)
              DO k = k1, kmz(l)
-               icl = icl + 1  
+               icl = icl + 1
                sNB (k,i) = sNGB (icl,no)*    weight + &
-                           sNGBp(icl,no)*(1.-weight)      
+                           sNGBp(icl,no)*(1.-weight)
                vhNB(k,i) = vhNGB (icl,no)*    weight + &
                            vhNGBp(icl,no)*(1.-weight)
                hvNB(k,i) = hvNGB (icl,no)*    weight + &
@@ -1556,20 +1556,20 @@ SUBROUTINE openbcUVH(thrs)
                !print *,k,l,weight
                !huNB(k,i) = hu(k,l)
              ENDDO
-               
+
            ENDDO
-           
+
          CASE(4)
-           j  = jsbcH(no,ide_t); 
-           is = isbcH(no,ide_t); 
+           j  = jsbcH(no,ide_t);
+           is = isbcH(no,ide_t);
            ie = iebcH(no,ide_t);
            icl = siptNBI(no,ide_t) -1
-           DO i = is, ie; 
-             l = ij2l(i,j) 
+           DO i = is, ie;
+             l = ij2l(i,j)
              DO k = k1, kmz(l)
-               icl = icl + 1   
+               icl = icl + 1
                sSB (k,i) = sNGB (icl,no)*    weight + &
-                           sNGBp(icl,no)*(1.-weight)     
+                           sNGBp(icl,no)*(1.-weight)
                vhSB(k,i) = vhNGB (icl,no)*    weight + &
                            vhNGBp(icl,no)*(1.-weight)
                !hvSB(k,i) = h(k,l)
@@ -1593,8 +1593,8 @@ SUBROUTINE openbcUVH(thrs)
                !huSB(k,i) = hu(k,l)
              ENDDO
            ENDDO
-         END SELECT   
- 
+         END SELECT
+
       END SELECT
 !      print *,"uhWB:",sum(uhWB(:,:)),"huWB:",sum(huWB(:,:))
    END DO
@@ -1621,103 +1621,103 @@ SUBROUTINE readbcNGB(thrs)
    IF (nopen <= 0 .OR. ioNBTOGGLE <= 0) RETURN
 
    ! ... Initialize counter for nested grid boundaries
-   niNGB = 0; 
+   niNGB = 0;
    ide_t = omp_get_thread_num()+1
 
    !$omp barrier
 !$omp barrier
    ! ... Loop over open boundaries
-   DO nn = 1, nopenH(ide_t) 
+   DO nn = 1, nopenH(ide_t)
      no = noh2no(nn,ide_t)
      ! ... Cycle if not an embedded boundary
      IF ( itype(no) < 4 ) CYCLE
 
-     ! ... Update counter for nested grid boundaries ...    
-     niNGB = niNGB + 1; 
+     ! ... Update counter for nested grid boundaries ...
+     niNGB = niNGB + 1;
 
      ! Save and read new frame if thrs > thrsNGB .......
-     
+
      !IF (thrs > thrsNGB(no)) THEN
 
        ! ... Save variables from previous time .........
-       thrsNGBp(no) = thrsNGB(no); 
-       uhNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = uhNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no); 
-       vhNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = vhNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no); 
+       thrsNGBp(no) = thrsNGB(no);
+       uhNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = uhNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
+       vhNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = vhNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
        scNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = scNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
        sNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = sNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
-       huNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = huNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no); 
+       huNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = huNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
        hvNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = hvNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
-       agNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = agNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no); 
+       agNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = agNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
        arNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no) = arNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),no);
-       IF (ntr > 0) THEN 
+       IF (ntr > 0) THEN
          trNGBp(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),:,no) = trNGB(siptNBIH(no,ide_t):eiptNBIH(no,ide_t),:,no);
        ENDIF
-!       uhNGBp = uhNGB; 
-!       vhNGBp = vhNGB; 
-!       scNGBp = scNGB; 
+!       uhNGBp = uhNGB;
+!       vhNGBp = vhNGB;
+!       scNGBp = scNGB;
 !       trNGBp = trNGB;
 
-       ! ... Set file ID ...............................            
+       ! ... Set file ID ...............................
        nbiid = nbiid0 + no
 
-       ! ... Allocate space for temporary input variable array 
+       ! ... Allocate space for temporary input variable array
        ALLOCATE( inputvar ( iptNBI(no), 11+ntr ), STAT=istat )
        IF (istat /= 0) CALL allocate_error (istat,34)
 
        ! ... Read variables for NEXT FRAME variables ...
-       
+
        !$omp critical
        !print *,"*********************************"
        !print *,"nthrsNGB:",thrsNGB(no),"hebra:",ide_t,"thrs:",thrs
-       READ(nbiid) auxthrs, & 
+       READ(nbiid) auxthrs, &
            ((inputvar(m1,m2),m2=4,11+ntr),m1=1,iptNBI(no))
            contNG(no)=contNG(no)+1
-           
+
            if(contNG(no) .EQ.  nopth(no))THEN
                contNG(no) = 0
                thrsNGB(no) = auxthrs
            else
                BACKSPACE nbiid
-               
+
            end if
-       !print *,"despues:",thrsNGB(no),"input1:",sum(inputvar(:,4)),"input2:",sum(inputvar(:,5))   
+       !print *,"despues:",thrsNGB(no),"input1:",sum(inputvar(:,4)),"input2:",sum(inputvar(:,5))
        !print *,"siptNBI:",siptNBI(no,ide_t),"eiptNBI:",eiptNBI(no,ide_t)
        !print *,"contNG:",contNG(no),"nopth:",nopth(no)
-       !print *,"-----------------------------------------" 
+       !print *,"-----------------------------------------"
        !$omp end critical
-  
-       ! ... Assign variables  
+
+       ! ... Assign variables
        SELECT CASE (iside(no))
        CASE(1,3)
          DO icl = siptNBI(no,ide_t), eiptNBI(no,ide_t)
            uhNGB(icl,no) = inputvar(icl,4)
-           scNGB(icl,no) = inputvar(icl,5) 
+           scNGB(icl,no) = inputvar(icl,5)
            vhNGB(icl,no) = inputvar(icl,6)
            sNGB(icl,no) = inputvar(icl,7) !MAC NESTING
-           huNGB(icl,no) = inputvar(icl,8) 
+           huNGB(icl,no) = inputvar(icl,8)
            hvNGB(icl,no) = inputvar(icl,9)
-           agNGB(icl,no) = inputvar(icl,10) 
+           agNGB(icl,no) = inputvar(icl,10)
            arNGB(icl,no) = inputvar(icl,11)
            IF (ntr > 0) THEN
-             trNGB(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr) 
+             trNGB(icl,1:ntr,niNGB) = inputvar(icl,12:11+ntr)
            ENDIF
          ENDDO
        CASE(2,4)
          DO icl = siptNBI(no,ide_t), eiptNBI(no,ide_t)
            vhNGB(icl,no) = inputvar(icl,4)
-           scNGB(icl,no) = inputvar(icl,5) 
+           scNGB(icl,no) = inputvar(icl,5)
            uhNGB(icl,no) = inputvar(icl,6)
            sNGB(icl,no) = inputvar(icl,7) !MAC NESTING
-           huNGB(icl,no) = inputvar(icl,8) 
+           huNGB(icl,no) = inputvar(icl,8)
            hvNGB(icl,no) = inputvar(icl,9)
-           agNGB(icl,no) = inputvar(icl,10) 
+           agNGB(icl,no) = inputvar(icl,10)
            arNGB(icl,no) = inputvar(icl,11)
            IF (ntr > 0) THEN
-             trNGB(icl,1:ntr,no) = inputvar(icl,12:11+ntr) 
+             trNGB(icl,1:ntr,no) = inputvar(icl,12:11+ntr)
            ENDIF
          ENDDO
        END SELECT
-          
+
        DEALLOCATE (inputvar)
      !print *,"nthrsNGB:",thrsNGB(no),"hebra:",ide_t,"thrs:",thrs
      !print *,"uhNGB:",sum(uhNGB(:,:)),"trNGB:",sum(trNGB(:,:,:)),"scNGB:",sum(scNGB(:,:))
@@ -1727,7 +1727,7 @@ SUBROUTINE readbcNGB(thrs)
      !print *,"******************************"
 
      !ENDIF
-     
+
    ENDDO
    !$omp barrier
 END SUBROUTINE readbcNGB
@@ -1745,13 +1745,13 @@ SUBROUTINE MODmatcon(Bstart,Bend,Beagx,Beagy,Bearx,Beary,Bagx,Bagy,Barx,Bary)
    INTEGER, INTENT(IN) :: Bstart,Bend
    REAL, DIMENSION (1:km1,Bstart:Bend+1), INTENT(INOUT) :: Bagx,Barx,Bagy,Bary
    REAL, DIMENSION (Bstart:Bend+1), INTENT(INOUT) :: Beagx,Bearx,Beagy,Beary
-   
+
 
    !.....Local variables.....
    INTEGER :: i, j, nn, is, ie, js, je, ks, ke,l,iaux,jaux,k1x,kmx
    REAL    :: dt1, dtdx1, dtdy1,no,ide_t
 
-   
+
    ide_t = omp_get_thread_num()+1
    !.....Loop over open boundaries.....
    DO nn = 1, nopenH(ide_t)
@@ -1768,11 +1768,11 @@ SUBROUTINE MODmatcon(Bstart,Bend,Beagx,Beagy,Bearx,Beary,Bagx,Bagy,Barx,Bary)
          CASE (1)
             i = isbcHH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
             ! Adjust [qq] array for flow rate into the
-            ! column of nodes just inside the boundary 
+            ! column of nodes just inside the boundary
             DO j = js, je
                l = ij2l(i,j)
-               
-               
+
+
             END DO
 
          ! North boundary
@@ -1803,16 +1803,16 @@ SUBROUTINE MODmatcon(Bstart,Bend,Beagx,Beagy,Bearx,Beary,Bagx,Bagy,Barx,Bary)
 
          ! South boundary
          CASE (4)
-            j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)          
+            j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
             ! Adjust [qq] array for flow rate into the
             ! row of nodes just inside the boundary
             DO i = is, ie
                l = ij2l(i,j)
-               
+
             END DO
          END SELECT
 
-      
+
 
       END SELECT
    END DO
@@ -1832,13 +1832,13 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
    INTEGER, INTENT(IN) :: Bstart,Bend
    REAL, DIMENSION (Bstart:Bend+1), INTENT(INOUT) :: Bqq,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Beary,Brr
    INTEGER, DIMENSION(Bstart:Bend+1), INTENT(IN) :: lWCH,lSCH
-   
+
 
    !.....Local variables.....
    INTEGER :: i, j, nn, is, ie, js, je, ks, ke,laux,iaux,jaux,l,k1s,kms
    REAL    :: dt1, dtdx1, dtdy1,no,ide_t,cx,rho4sx,rho4sy,cy
 
-   
+
    !.....Constants.....
    cx     = gdt2dx2*tz*tz;
    cy     = gdt2dy2*tz*tz;
@@ -1853,10 +1853,10 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
    DO nn = 1, nopenH(ide_t)
       no = noh2no(nn,ide_t)
       SELECT CASE ( itype(no) )
- 
+
       !.....Case 1 -- wse specified.....
       CASE (1)
-         
+
          ! Identify wse boundary as on the west, north, east, or south
          SELECT CASE ( iside(no) )
          ! West boundary
@@ -1905,7 +1905,7 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
             DO iaux=is,ie
             	Bsy(ij2l(iaux,j)) = 0.0
             END DO
-            
+
          END SELECT
 
       !.....Case 2,4  -- Free surface flow specified.....
@@ -1918,7 +1918,7 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
          CASE (1)
             i = isbcHH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
             ! Adjust [qq] array for flow rate into the
-            ! column of nodes just inside the boundary 
+            ! column of nodes just inside the boundary
             DO j = js, je
                l = ij2l(i,j)
                k1s = k1
@@ -1933,7 +1933,7 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
                Bqq(l) = Bqq(l) + dtdx1*SUM(uhWB  (k1:kmz(l),j)) &
                                      + dtdx1*SUM(uhWBpp(k1:kmz(l),j))
                !Brr(l) = 1 + Bsx(l) + (cx * rho4sx * SUM(arWB(:,j))) + Bsy(l) + Bsy(lSCH(l))
-               
+
             END DO
 
          ! North boundary
@@ -1976,13 +1976,13 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
                !&       - (dtdy1)*(Beagy(l)-Beagy(lSCH(l)))   &
                !&       - Bdd(l)
                Bqq(l) = Bqq(l) - dtdx1*SUM(uhEB  (k1:kmz(l),j)) &
-                                     - dtdx1*SUM(uhEBpp(k1:kmz(l),j)) 
+                                     - dtdx1*SUM(uhEBpp(k1:kmz(l),j))
                !Brr(l) = 1 + (cx * rho4sx * SUM(arEB(:,j))) + Bsx(lWCH(l)) + Bsy(l) + Bsy(lSCH(l))
             END DO
 
          ! South boundary
          CASE (4)
-            j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)          
+            j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
             ! Adjust [qq] array for flow rate into the
             ! row of nodes just inside the boundary
             DO i = is, ie
@@ -2010,19 +2010,19 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
 
          ! West boundary
          CASE (1)
-            i  = isbc(no); 
+            i  = isbc(no);
             j  = jsbc(no);
             ks = iebc(no);
             ke = jebc(no);
             ! Adjust [qq] array for flow rate into the
-            ! column of nodes just inside the boundary 
+            ! column of nodes just inside the boundary
             Bqq(laux) = Bqq(laux) + dtdx1*SUM(uhWB  (ks:ke,j)) &
                                   + dtdx1*SUM(uhWBpp(ks:ke,j))
 
          ! North boundary
          CASE (2)
-            j  = jsbc(no); 
-            i  = isbc(no); 
+            j  = jsbc(no);
+            i  = isbc(no);
             ks = iebc(no);
             ke = jebc(no);
             ! Adjust [qq] array for flow rate into the
@@ -2032,19 +2032,19 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
 
          ! East boundary
          CASE (3)
-            i  = isbc(no); 
+            i  = isbc(no);
             j  = jsbc(no);
             ks = iebc(no);
             ke = jebc(no);
             ! Adjust [qq] array for flow rate into the
             ! column of nodes just inside the boundary
             Bqq(laux) = Bqq(laux) - dtdx1*SUM(uhEB  (ks:ke,j)) &
-                                  - dtdx1*SUM(uhEBpp(ks:ke,j)) 
+                                  - dtdx1*SUM(uhEBpp(ks:ke,j))
 
          ! South boundary
          CASE (4)
-            j  = jsbc(no); 
-            i  = isbc(no); 
+            j  = jsbc(no);
+            i  = isbc(no);
             ks = iebc(no);
             ke = jebc(no);
             ! Adjust [qq] array for flow rate into the
@@ -2059,14 +2059,14 @@ SUBROUTINE MODqqddrr4openBC(Bstart,Bend,Bqq,Brr,Bsx,Bsy,Bdd,Beagx,Beagy,Bearx,Be
 END SUBROUTINE MODqqddrr4openBC
 
 !************************************************************************
-SUBROUTINE MODcoef4openBC 
+SUBROUTINE MODcoef4openBC
 !************************************************************************
 !
 !  Purpose: To adjust the matrix coefficients used in the soln of the
 !           continuity equation to account for open boundary conditions.
 !
 !------------------------------------------------------------------------
- 
+
    !.....Local variables.....
    INTEGER :: i, j, nn, is, ie, js, je, m,no,ide_t,l
    REAL :: cx,cy,dtdx1,dtdy1,dt1,rho4sx,rho4sy
@@ -2081,13 +2081,13 @@ SUBROUTINE MODcoef4openBC
 
    ide_t = omp_get_thread_num()+1
    ! ... Return if no open boundaries are specified
-   
+
 
    !.....Loop over open boundaries.....
    DO nn = 1, nopenH(ide_t)
      no = noh2no(nn,ide_t)
       SELECT CASE ( itype(no) )
- 
+
       !.....Case 1 -- wse specified.....
       CASE (1)
 
@@ -2096,8 +2096,8 @@ SUBROUTINE MODcoef4openBC
 
          ! West boundary
          CASE (1)
-             i  = isbcH(no,ide_t); 
-             js = jsbcH(no,ide_t); 
+             i  = isbcH(no,ide_t);
+             js = jsbcH(no,ide_t);
              je = jebcH(no,ide_t);
             DO j = js, je
 !              m = (i-ifirst)*ibdwd + (j-jfirst)+1
@@ -2107,14 +2107,14 @@ SUBROUTINE MODcoef4openBC
               coeffA(m,3) = 0.
               coeffA(m,4) = 0.
               coeffA(m,5) = 0.
-              rhs(m)    = 1.E1 * s(m) 
+              rhs(m)    = 1.E1 * s(m)
               zeta(m)   = s(m)
-            ENDDO           
+            ENDDO
 
          ! North boundary
          CASE (2)
-            j  = jsbcH(no,ide_t); 
-            is = isbcHH(no,ide_t); 
+            j  = jsbcH(no,ide_t);
+            is = isbcHH(no,ide_t);
             ie = iebcHH(no,ide_t);
             DO i = is, ie
 !              m = (i-ifirst)*ibdwd + (j-jfirst)+1
@@ -2124,14 +2124,14 @@ SUBROUTINE MODcoef4openBC
               coeffA(m,3) = 0.
               coeffA(m,4) = 0.
               coeffA(m,5) = 0.
-              rhs(m)    = 1.E1 * s(m) 
+              rhs(m)    = 1.E1 * s(m)
               zeta(m)   = s(m)
-            ENDDO        
-   
+            ENDDO
+
          ! East boundary
          CASE (3)
-            i  = isbcH(no,ide_t); 
-            js = jsbcH(no,ide_t); 
+            i  = isbcH(no,ide_t);
+            js = jsbcH(no,ide_t);
             je = jebcH(no,ide_t);
             DO j = js, je
 !              m = (i-ifirst)*ibdwd + (j-jfirst)+1
@@ -2142,13 +2142,13 @@ SUBROUTINE MODcoef4openBC
               coeffA(m,4) = 0.
               coeffA(m,5) = 0.
               rhs(m)    = 1.E1 * s(m)
-              zeta(m)   = s(m) 
-            ENDDO           
- 
+              zeta(m)   = s(m)
+            ENDDO
+
          ! South boundary
          CASE (4)
-            j  = jsbcH(no,ide_t); 
-            is = isbcHH(no,ide_t); 
+            j  = jsbcH(no,ide_t);
+            is = isbcHH(no,ide_t);
             ie = iebcHH(no,ide_t);
             DO i = is, ie
 !              m = (i-ifirst)*ibdwd + (j-jfirst)+1
@@ -2158,9 +2158,9 @@ SUBROUTINE MODcoef4openBC
               coeffA(m,3) = 0.
               coeffA(m,4) = 0.
               coeffA(m,5) = 0.
-              rhs(m)    = 1.E1*s(m) 
+              rhs(m)    = 1.E1*s(m)
               zeta(m)   = s(m)
-            ENDDO           
+            ENDDO
 
          END SELECT
 
@@ -2174,7 +2174,7 @@ SUBROUTINE MODcoef4openBC
          CASE (1)
             i = isbcHH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
             ! Adjust [qq] array for flow rate into the
-            ! column of nodes just inside the boundary 
+            ! column of nodes just inside the boundary
             DO j = js, je
                l = ij2l(i,j)
                coeffA (l,2) = -(cx * rho4sx * SUM(arWB(:,j)))
@@ -2203,14 +2203,14 @@ SUBROUTINE MODcoef4openBC
 
          ! South boundary
          CASE (4)
-            j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)          
+            j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
             ! Adjust [qq] array for flow rate into the
             ! row of nodes just inside the boundary
             DO i = is, ie
                l = ij2l(i,j)
                coeffA (l,3) = -(cy * rho4sy * SUM(arSB(:,i)))
             END DO
-         END SELECT   
+         END SELECT
 
       END SELECT
    END DO
@@ -2218,11 +2218,11 @@ SUBROUTINE MODcoef4openBC
 END SUBROUTINE MODcoef4openBC
 
 !************************************************************************
-SUBROUTINE MODexmom4openBCX 
+SUBROUTINE MODexmom4openBCX
 !************************************************************************
 !
-!  Purpose: To recompute ex matrix for velocity columns located along or 
-!           next to open boundaries 
+!  Purpose: To recompute ex matrix for velocity columns located along or
+!           next to open boundaries
 !
 !------------------------------------------------------------------------
 
@@ -2240,7 +2240,7 @@ SUBROUTINE MODexmom4openBCX
    DO nn = 1, nopenHH(ide_t)
      no = noh2noH(nn,ide_t)
      SELECT CASE ( itype(no) )
- 
+
      !....... Case 1 -- wse specified .....................................
      CASE (1)
 
@@ -2250,15 +2250,15 @@ SUBROUTINE MODexmom4openBCX
        ! ..... West boundary ......
        CASE (1)
 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
-         
+
          DO j = js, je
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j);
-           
+
            ! Compute the layer number for the bottom wet u-pt
            kmx = MIN(kmz(lEC(l)), kmz(l))
            k1x =                 k1u(l)
@@ -2270,14 +2270,14 @@ SUBROUTINE MODexmom4openBCX
            ! Compute explicit term (only using advection)
            ex(:,l) = 0.0
            DO k = k1x,kmx
-                                                                   
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
             uW = uhp(k,        l  ) +uhp(k  ,    l )
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* upp(k,lEC(l)) -           &
                      (uW+ABS(uW))* upp(k,    l ) -           &
@@ -2285,19 +2285,19 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* upp(k,lNC(l)) -           &
                      (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                        (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * upp(k+1,l) +           &
                        (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
             !.....Final explicit term.....
             ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
-            
+
            END DO
-           
+
          END DO
 
        ! ..... North boundary ......
@@ -2308,8 +2308,8 @@ SUBROUTINE MODexmom4openBCX
 
        ! ..... East boundary ......
        CASE (3)
-         i  = isbcH(no,ide_t)-1; 
-         js = jsbcH(no,ide_t)  ; 
+         i  = isbcH(no,ide_t)-1;
+         js = jsbcH(no,ide_t)  ;
          je = jebcH(no,ide_t)  ;
          DO j = js, je
 
@@ -2327,14 +2327,14 @@ SUBROUTINE MODexmom4openBCX
            ! Compute explicit term (only using advection)
            ex(:,l) = 0.0
            DO k = k1x,kmx
-                                                                   
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uE = uhp(k,        l  ) +uhp(k  ,    l )
-            uW = uhp(k,        l  ) +uhp(k  ,lWC(l)) 
+            uW = uhp(k,        l  ) +uhp(k  ,lWC(l))
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* upp(k,    l ) -           &
                      (uW+ABS(uW))* upp(k,lWC(l)) -           &
@@ -2342,19 +2342,19 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* upp(k,lNC(l)) -           &
                      (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                        (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * upp(k+1,l) +           &
                        (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
             !.....Final explicit term.....
-            ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv) 
-  
+            ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
+
            END DO
-         ENDDO           
+         ENDDO
 
        ! ..... South boundary ......
        CASE (4)
@@ -2365,20 +2365,20 @@ SUBROUTINE MODexmom4openBCX
 
      !....... Case 2,4 -- Free surface flow specified ......................
      CASE (2,4)
-      
+
       ! Identify wse boundary as on the west, north, east, or south
        SELECT CASE ( iside(no) )
 
        ! ..... West boundary ......
        CASE (1)
 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t)
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
 
            ! ... Cycle if E-column is dry
            IF (.NOT. mask2d(i+1,j)) CYCLE
@@ -2398,8 +2398,8 @@ SUBROUTINE MODexmom4openBCX
             !.....Coriolis.....
             corx = 0.25 * f * (vhp(k,     lEC(l) ) + vhp(k,    l )       & !MAC NESTING
                   &           +vhp(k, lSC(lEC(l))) + vhp(k,lSC(l)))
-                                                                   
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uhbdry = (uhWB(k,j)+uhWBpp(k,j))/2.
             IF (huWBpp(k,j)>ZERO) THEN
                ubdry  = uhWBpp(k,j)/huWBpp(k,j)
@@ -2411,7 +2411,7 @@ SUBROUTINE MODexmom4openBCX
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* upp(k,lEC(l)) -           &
                      (uW+ABS(uW))* ubdry         -           &
@@ -2419,7 +2419,7 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* upp(k,lNC(l)) -           &
                      (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
@@ -2433,27 +2433,27 @@ SUBROUTINE MODexmom4openBCX
                     & + (haxpp(k,    l )*(upp(k,lEC(l))-upp(k,    l ))       &
                     & -  aux*(upp(k,    l )-ubdry))/dxdx
 
-			      		                                  
+
             !.....Final explicit term.....
             ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv-corx-hdx)
-                
+
            END DO
          END DO
 
        ! ..... North boundary ......
        CASE (2)
 
-       j  = jsbcH(no,ide_t); 
-       is = isbcH(no,ide_t); 
+       j  = jsbcH(no,ide_t);
+       is = isbcH(no,ide_t);
        ie = iebcH(no,ide_t)
-       
+
        DO i = is, ie
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
-           
-           
-           
+           l = ij2l(i,j);
+
+
+
            ! Compute the layer number for top & bottom wet v-pt
            !kmx = kmz(l)                    !MAC NESTING
            !DO k = k1, kmx
@@ -2473,11 +2473,11 @@ SUBROUTINE MODexmom4openBCX
            ! Compute number of wet layers & skip for dry cells
            nwlayers = (kmx-k1x) + 1
            IF(nwlayers < 1) CYCLE
-           
+
            ! Compute number of wet layers & skip for dry cells
            nwlayers = (kmx-k1x) + 1
            IF(nwlayers < 1) CYCLE
-           
+
            ! Compute explicit term (only using advection)
            ex(:,l) = 0.0
            sumadvx=0
@@ -2485,18 +2485,18 @@ SUBROUTINE MODexmom4openBCX
                 sumhdx=0
            DO k = k1x,kmx
             !vhbdry = (vhNB(k,i)+vhNBpp(k,i))/2.
-            vhbdry = vhNBp(k,i)     
+            vhbdry = vhNBp(k,i)
             if(i .EQ. ie) THEN
                 aux = vhp(k,lm1)
             else
                 !aux = (vhNB(k,i+1)+vhNBpp(k,i+1))/2.
                 aux = vhNBp(k,i+1)
-            end if               
+            end if
             !.....Coriolis.....
             corx = 0.25 * f * (aux + vhbdry       &  !MAC NESTING
                   &           +vhp(k, lSC(lEC(l))) + vhp(k,lSC(l)))
-                                        
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uhbdry = (uhNB(k,i)+uhNBpp(k,i))/2.
             IF (auxhNBpp(k,i)>ZERO) THEN
                ubdry  = uhNBpp(k,i)/auxhNBpp(k,i)   !MAC NESTING
@@ -2508,7 +2508,7 @@ SUBROUTINE MODexmom4openBCX
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* upp(k,lEC(l)) -           &
                      (uW+ABS(uW))* upp(k,lWC(l)) -           &
@@ -2516,14 +2516,14 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* ubdry         -           &
                      (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                        (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * upp(k+1,l) +           &
                        (wD-ABS(wD)) * upp(k  ,l)) / 4.
-            
+
             haypp(k,l)=Ay0*MIN(auxhNBpp(k,i),hupp(k,l))         !MAC NESTING
             hdx  =   (haypp(k,    l )*(ubdry-upp(k,    l ))       &
                     & -  haypp(k,lSC(l))*(upp(k,    l )-upp(k,lSC(l))))/dydy &
@@ -2538,13 +2538,13 @@ SUBROUTINE MODexmom4openBCX
                 !sumadvx=sumadvx+advx
                 !sumcorx=sumcorx+corx
                 !sumhdx=sumhdx+hdx
-                
-            !end if	      		                                  
+
+            !end if
             !.....Final explicit term.....
             ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv-corx-hdx)
-                
+
            END DO
-           
+
            !if(j .EQ. jsbc(1) .AND. i <= iebc(1) .AND. i >= isbc(1)) THEN
                 !print *,"aqui no entro"
                 !print *,"uuhpp:",sum(uhpp(:,l)),i,j
@@ -2561,13 +2561,13 @@ SUBROUTINE MODexmom4openBCX
        ! ..... East boundary ......
        CASE (3)
 
-         i  = isbcH(no,ide_t)-1; 
-         js = jsbcH(no,ide_t)  ; 
-         je = jebcH(no,ide_t)  ; 
+         i  = isbcH(no,ide_t)-1;
+         js = jsbcH(no,ide_t)  ;
+         je = jebcH(no,ide_t)  ;
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
 
            ! ... Cycle if E-column is dry
            IF (.NOT. mask2d(i+1,j)) CYCLE
@@ -2583,12 +2583,12 @@ SUBROUTINE MODexmom4openBCX
            ! Compute explicit term (only using advection)
            ex(:,l) = 0.0
            DO k = k1x,kmx
-                   
+
             !.....Coriolis.....
             corx = 0.25 * f * (vhp(k,     lEC(l) ) + vhp(k,    l )       &  !MAC NESTING
                   &           +vhp(k, lSC(lEC(l))) + vhp(k,lSC(l)))
-                                                
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uhbdry = (uhEB(k,j)+uhEBpp(k,j))/2.
             IF (huEBpp(k,j)>ZERO) THEN
                ubdry  = uhEBpp(k,j)/huEBpp(k,j)
@@ -2596,11 +2596,11 @@ SUBROUTINE MODexmom4openBCX
                ubdry  = 0.0
             ENDIF
             uE = uhp(k,        l  ) +uhbdry
-            uW = uhp(k,    lWC(l) ) +uhp(k  ,    l ) 
+            uW = uhp(k,    lWC(l) ) +uhp(k  ,    l )
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* ubdry         -           &
                      (uW+ABS(uW))* upp(k,lWC(l)) -           &
@@ -2608,7 +2608,7 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* upp(k,lNC(l)) -           &
                      (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
@@ -2621,18 +2621,18 @@ SUBROUTINE MODexmom4openBCX
                     & -  haypp(k,lSC(l))*(upp(k,    l )-upp(k,lSC(l))))/dydy &
                     & + (haxpp(k,    l )*(ubdry-upp(k,    l ))       &
                     & -  haxpp(k,lWC(l))*(upp(k,    l )-upp(k,lWC(l))))/dxdx
-		      		                                  
+
             !.....Final explicit term.....
             ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv-corx-hdx)
-  
+
            END DO
-         ENDDO           
+         ENDDO
 
        ! ..... South boundary ......
        CASE (4)
 
-       j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+       j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
 
@@ -2653,32 +2653,32 @@ SUBROUTINE MODexmom4openBCX
            ! Compute explicit term (only using advection)
            ex(:,l) = 0.0
            DO k = k1x,kmx
-            !vhbdry = (vhSB(k,i)+vhSBpp(k,i))/2.     
+            !vhbdry = (vhSB(k,i)+vhSBpp(k,i))/2.
             vhbdry = vhSBp(k,i)
             if(i .EQ. ie) THEN
                 aux = vhp(k,lm1)
             else
                 !aux = (vhSB(k,i+1)+vhSBpp(k,i+1))/2.
                 aux = vhSBp(k,i+1)
-            end if              
+            end if
             !.....Coriolis.....
             corx = 0.25 * f * (vhp(k,     lEC(l) ) + vhp(k,    l )       &
                   &           +aux + vhbdry)
-                                          
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uhbdry = (uhSB(k,i)+uhSBpp(k,i))/2.
             IF (auxhSBpp(k,i)>ZERO) THEN
                ubdry  = uhSBpp(k,i)/auxhSBpp(k,i)
             ELSE
                ubdry  = 0.0
             ENDIF
-            
+
             uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
             uW = uhp(k,        l  ) +uhp(k,    lWC(l) )
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = aux +vhbdry
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* upp(k,lEC(l)) -           &
                      (uW+ABS(uW))* upp(k,lWC(l)) -           &
@@ -2686,23 +2686,23 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* upp(k,lNC(l)) -           &
                      (vS+ABS(vS))* ubdry         -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                        (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * upp(k+1,l) +           &
                        (wD-ABS(wD)) * upp(k  ,l)) / 4.
-	    
-            aux=Ay0*MIN(auxhSBpp(k,i),hupp(k,l))		      		
+
+            aux=Ay0*MIN(auxhSBpp(k,i),hupp(k,l))
             hdx  =   (haypp(k,    l )*(upp(k,lNC(l))-upp(k,    l ))       &
                     & -  aux*(upp(k,    l )-ubdry))/dydy &
                     & + (haxpp(k,    l )*(upp(k,lEC(l))-upp(k,    l ))       &
-                    & -  haxpp(k,lWC(l))*(upp(k,    l )-upp(k,lWC(l))))/dxdx 
-                                  
+                    & -  haxpp(k,lWC(l))*(upp(k,    l )-upp(k,lWC(l))))/dxdx
+
             !.....Final explicit term.....
             ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv-corx-hdx)
-                
+
            END DO
          END DO
 
@@ -2717,8 +2717,8 @@ SUBROUTINE MODexmom4openBCX
        ! ..... West boundary ......
        CASE (1)
 
-         i  = isbc(no); 
-         j  = jsbc(no); 
+         i  = isbc(no);
+         j  = jsbc(no);
          ks = iebc(no);
          ke = jebc(no);
          l = ij2l(i,j);
@@ -2727,8 +2727,8 @@ SUBROUTINE MODexmom4openBCX
          ex(ks:ke,l) = 0.0
 
          DO k = ks,ke
-                                                                   
-            ! Horizontal advection - Upwind differencing  
+
+            ! Horizontal advection - Upwind differencing
             uhbdry = (uhWBpp(k,j)+uhWB  (k,j))/2.
             ubdry  =  uhWBpp(k,j)/huWBpp(k,j)
             uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
@@ -2736,7 +2736,7 @@ SUBROUTINE MODexmom4openBCX
             vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
             vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
             wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+            wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
             advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                      (uE-ABS(uE))* upp(k,lEC(l)) -           &
                      (uW+ABS(uW))* ubdry         -           &
@@ -2744,37 +2744,37 @@ SUBROUTINE MODexmom4openBCX
                   +( (vN+ABS(vN))* upp(k,    l ) +           &
                      (vN-ABS(vN))* upp(k,lNC(l)) -           &
                      (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                     (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                        (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * upp(k+1,l) +           &
                        (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
             !.....Final explicit term.....
             ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
-                
+
          END DO
 
        ! ..... North boundary ......
        CASE (2)
 
-         i  = isbc(no); 
-         j  = jsbc(no); 
+         i  = isbc(no);
+         j  = jsbc(no);
          ks = iebc(no);
          ke = jebc(no);
 
          ! Compute explicit term (use only advection) for u-points
 		 ! to the East of a water column with North flow specified
-         IF (mask2d(i+1,j)) THEN 
+         IF (mask2d(i+1,j)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j);
            ex(ks:ke,l) = 0.0
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              vhbdry = (vhNBpp(k,i)+vhNB  (k,i))/2.
              ! vbdry  =  vhNBpp(k,i)/hvNBpp(k,i)
              uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
@@ -2782,7 +2782,7 @@ SUBROUTINE MODexmom4openBCX
              vN = vhp(k,    lEC(l) ) +vhbdry
              vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
              wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
              advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                       (uE-ABS(uE))* upp(k,lEC(l)) -           &
                       (uW+ABS(uW))* upp(k,lWC(l)) -           & ! 30062008
@@ -2790,32 +2790,32 @@ SUBROUTINE MODexmom4openBCX
                    +( (vN+ABS(vN))* upp(k,    l ) +           &
                       (vN-ABS(vN))* upp(k,lNC(l)) -           &
                       (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                         (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * upp(k+1,l) +           &
                         (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
-                
-           END DO 
+
+           END DO
 
          ENDIF
 
          ! Compute explicit term (use only advection) for u-points
          ! to the West of a water column with North flow specified
-         IF (mask2d(i-1,j)) THEN 
+         IF (mask2d(i-1,j)) THEN
 
            l = ij2l(i-1,j);
 
            ! Compute explicit term (use only advection)
            ex(ks:ke,l) = 0.0
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              vhbdry = (vhNBpp(k,i)+vhNB  (k,i))/2.
              ! vbdry  =  vhNBpp(k,i)/hvNBpp(k,i)
              uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
@@ -2823,7 +2823,7 @@ SUBROUTINE MODexmom4openBCX
              vN = vhbdry             +vhp(k  ,    l )
              vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
              wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
              advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                       (uE-ABS(uE))* upp(k,lEC(l)) -           &
                       (uW+ABS(uW))* upp(k,lWC(l)) -           &  ! 30062008
@@ -2831,17 +2831,17 @@ SUBROUTINE MODexmom4openBCX
                    +( (vN+ABS(vN))* upp(k,    l ) +           &
                       (vN-ABS(vN))* upp(k,lNC(l)) -           &
                       (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
+                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                         (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * upp(k+1,l) +           &
                         (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
-                
+
            END DO
 
          ENDIF
@@ -2849,8 +2849,8 @@ SUBROUTINE MODexmom4openBCX
        ! ..... East boundary ......
        CASE (3)
 
-         i  = isbc(no)-1; 
-         j  = jsbc(no)  ; 
+         i  = isbc(no)-1;
+         j  = jsbc(no)  ;
          ks = iebc(no)  ;
          ke = jebc(no)  ;
 
@@ -2860,8 +2860,8 @@ SUBROUTINE MODexmom4openBCX
          ! Compute explicit term (only using advection)
          ex(ks:ke,l) = 0.0
          DO k = ks,ke
-                                                                   
-           ! Horizontal advection - Upwind differencing  
+
+           ! Horizontal advection - Upwind differencing
            uhbdry = (uhEB(k,j)+uhEBpp(k,j))/2.
            ubdry  = uhEBpp(k,j)/huEBpp(k,j)
            uE = uhp(k,        l  ) +uhbdry
@@ -2869,7 +2869,7 @@ SUBROUTINE MODexmom4openBCX
            vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
            vS = vhp(k,lSC(lEC(l))) +vhp(k  ,lSC(l))
            wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-           wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+           wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
            advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                     (uE-ABS(uE))* ubdry         -           &
                     (uW+ABS(uW))* upp(k,lWC(l)) -           &
@@ -2877,8 +2877,8 @@ SUBROUTINE MODexmom4openBCX
                  +( (vN+ABS(vN))* upp(k,    l ) +           &
                     (vN-ABS(vN))* upp(k,lNC(l)) -           &
                     (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                    (vS-ABS(vS))* upp(k,    l ) ) / fourdy  
-			      		                                  
+                    (vS-ABS(vS))* upp(k,    l ) ) / fourdy
+
            ! Vertical advection - Upwind for near bdry. cells
            advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                       (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
@@ -2886,21 +2886,21 @@ SUBROUTINE MODexmom4openBCX
                       (wD-ABS(wD)) * upp(k  ,l)) / 4.
 
            !.....Final explicit term.....
-           ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv) 
-  
+           ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
+
          END DO
 
        ! ..... South boundary ......
        CASE (4)
 
-         i  = isbc(no); 
-         j  = jsbc(no); 
+         i  = isbc(no);
+         j  = jsbc(no);
          ks = iebc(no);
          ke = jebc(no);
 
          ! Compute explicit term (use only advection) for u-points
 		 ! to the East of a water column with North flow specified
-         IF (mask2d(i+1,j)) THEN 
+         IF (mask2d(i+1,j)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j);
@@ -2909,8 +2909,8 @@ SUBROUTINE MODexmom4openBCX
            ex(ks:ke,l) = 0.0
 
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              vhbdry = (vhSBpp(k,i)+vhSB  (k,i))/2.
              ! vbdry  =  vhSBpp(k,i)/hvSBpp(k,i)
              uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
@@ -2918,7 +2918,7 @@ SUBROUTINE MODexmom4openBCX
              vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
              vS = vhp(k,lSC(lEC(l))) +vhbdry
              wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
              advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                       (uE-ABS(uE))* upp(k,lEC(l)) -           &
                       (uW+ABS(uW))* upp(k,lWC(l)) -           & !30062008
@@ -2926,17 +2926,17 @@ SUBROUTINE MODexmom4openBCX
                    +( (vN+ABS(vN))* upp(k,    l ) +           &
                       (vN-ABS(vN))* upp(k,lNC(l)) -           &
                       (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy   
+                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                         (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * upp(k+1,l) +           &
                         (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
-               
+
            END DO
 
          ENDIF
@@ -2944,17 +2944,17 @@ SUBROUTINE MODexmom4openBCX
 
          ! Compute explicit term (use only advection) for u-points
          ! to the West of a water column with North flow specified
-         IF (mask2d(i-1,j)) THEN 
+         IF (mask2d(i-1,j)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i-1,j);
- 
+
            ! Compute explicit term (use only advection)
            ex(ks:ke,l) = 0.0
 
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              vhbdry = (vhSBpp(k,i)+vhSB  (k,i))/2.
              ! vbdry  =  vhSBpp(k,i)/hvSBpp(k,i)
              uE = uhp(k,    lEC(l) ) +uhp(k  ,    l )
@@ -2962,7 +2962,7 @@ SUBROUTINE MODexmom4openBCX
              vN = vhp(k,    lEC(l) ) +vhp(k  ,    l )
              vS = vhbdry             +vhp(k  ,lSC(l))
              wU = wp (k,    lEC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lEC(l) ) +wp (k+1,    l )
              advx = ( (uE+ABS(uE))* upp(k,    l ) +           &
                       (uE-ABS(uE))* upp(k,lEC(l)) -           &
                       (uW+ABS(uW))* upp(k,lWC(l)) -           &
@@ -2970,17 +2970,17 @@ SUBROUTINE MODexmom4openBCX
                    +( (vN+ABS(vN))* upp(k,    l ) +           &
                       (vN-ABS(vN))* upp(k,lNC(l)) -           &
                       (vS+ABS(vS))* upp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy   
+                      (vS-ABS(vS))* upp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advx=advx+((wU+ABS(wU)) * upp(k  ,l) +           &
                         (wU-ABS(wU)) * upp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * upp(k+1,l) +           &
                         (wD-ABS(wD)) * upp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = uhpp(k,l) - twodt1*(advx*iadv)
-                
+
            END DO
 
          ENDIF
@@ -2998,11 +2998,11 @@ SUBROUTINE MODexmom4openBCX
 END SUBROUTINE MODexmom4openBCX
 
 !************************************************************************
-SUBROUTINE MODexmom4openBCY 
+SUBROUTINE MODexmom4openBCY
 !************************************************************************
 !
-!  Purpose: To recompute ex matrix for cells located next to cells with 
-!           open boundary conditions specified 
+!  Purpose: To recompute ex matrix for cells located next to cells with
+!           open boundary conditions specified
 !
 !------------------------------------------------------------------------
 
@@ -3021,7 +3021,7 @@ SUBROUTINE MODexmom4openBCY
    DO nn = 1, nopenHH(ide_t)
      no = noh2noH(nn,ide_t)
      SELECT CASE ( itype(no) )
- 
+
      !....... Case 1 -- wse specified......................................
      CASE (1)
 
@@ -3035,9 +3035,9 @@ SUBROUTINE MODexmom4openBCY
 
        ! ..... North boundary ......
        CASE (2)
-         
-         j  = jsbcH(no,ide_t)-1; 
-         is = isbcH(no,ide_t)  ; 
+
+         j  = jsbcH(no,ide_t)-1;
+         is = isbcH(no,ide_t)  ;
          ie = iebcH(no,ide_t)  ;
          DO i = is, ie
 
@@ -3053,16 +3053,16 @@ SUBROUTINE MODexmom4openBCY
            IF(nwlayers < 1) CYCLE
 
            ! Compute explicit term
-           ex(:,l) = 0.0	     
+           ex(:,l) = 0.0
            DO k = k1y,kmy
-                                                                 
-            ! Horizontal advection Upwind differencing 
+
+            ! Horizontal advection Upwind differencing
             uE = uhp(k,    lNC(l) ) +uhp(k,    l )
             uW = uhp(k,lWC(lNC(l))) +uhp(k,lWC(l))
             vN = vhp(k,        l  ) +vhp(k,    l )
             vS = vhp(k,        l  ) +vhp(k,lSC(l))
             wU = wp (k,    lNC(l) ) +wp (k,    l )
-            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
             advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                 &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                 &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3070,17 +3070,17 @@ SUBROUTINE MODexmom4openBCY
                 & +( (vN+ABS(vN))* vpp(k,    l ) +           &
             	&    (vN-ABS(vN))* vpp(k,    l ) -           &
                 &    (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                        (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * vpp(k+1,l) +           &
                        (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-                   
+
             !.....Final explicit term.....
             ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-                
+
            END DO
          END DO
 
@@ -3092,8 +3092,8 @@ SUBROUTINE MODexmom4openBCY
        ! ..... South boundary ......
        CASE (4)
 
-         j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+         j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t)
          DO i = is, ie
 
@@ -3109,16 +3109,16 @@ SUBROUTINE MODexmom4openBCY
            IF(nwlayers < 1) CYCLE
 
            ! Compute explicit term
-           ex(:,l) = 0.0	     
+           ex(:,l) = 0.0
            DO k = k1y,kmy
-                                                                 
-            ! Horizontal advection Upwind differencing 
+
+            ! Horizontal advection Upwind differencing
             uE = uhp(k,    lNC(l) ) +uhp(k,    l )
             uW = uhp(k,lWC(lNC(l))) +uhp(k,lWC(l))
             vN = vhp(k,    lNC(l) ) +vhp(k,    l )
             vS = vhp(k,        l  ) +vhp(k,    l )
             wU = wp (k,    lNC(l) ) +wp (k,    l )
-            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
             advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                 &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                 &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3126,19 +3126,19 @@ SUBROUTINE MODexmom4openBCY
                 & +( (vN+ABS(vN))* vpp(k,    l ) +           &
             	&    (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                 &    (vS+ABS(vS))* vpp(k,    l ) -           &
-                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind in near bdry. cells
             advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                        (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                      -((wD+ABS(wD)) * vpp(k+1,l) +           &
                        (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-                   
+
             !.....Final explicit term.....
             ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-                
+
            END DO
-         END DO 
+         END DO
 
        END SELECT
 
@@ -3151,14 +3151,14 @@ SUBROUTINE MODexmom4openBCY
        ! ..... West boundary ...... *** need to include code here
        CASE (1)
 
-       i  = isbcH(no,ide_t); 
+       i  = isbcH(no,ide_t);
 
-         js = jsbcH(no,ide_t); 
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t)
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
 
            ! ... Cycle if N-column is dry
            IF ( .NOT. mask2d(i,j+1) ) CYCLE
@@ -3170,19 +3170,19 @@ SUBROUTINE MODexmom4openBCY
            ! Compute number of wet layers & skip for dry cells
            nwlayers = (kmy-k1y) + 1
            IF(nwlayers < 1) CYCLE
-           
+
            ! Compute explicit term
-           ex(:,l) = 0.0	     
+           ex(:,l) = 0.0
            DO k = k1y,kmy
-            !uhbdry = (uhWB(k,j)+uhWBpp(k,j))/2.        !MAC NESTING 
-            uhbdry = uhWBp(k,j)               
+            !uhbdry = (uhWB(k,j)+uhWBpp(k,j))/2.        !MAC NESTING
+            uhbdry = uhWBp(k,j)
             if(j .EQ. je) THEN
                 aux = uhp(k,lm1)
             else
-                !aux = (uhWB(k,j+1)+uhWBpp(k,j+1))/2. 
-                 aux = uhWBp(k,j+1)  
-            end if                                
-            ! Horizontal advection Upwind differencing 
+                !aux = (uhWB(k,j+1)+uhWBpp(k,j+1))/2.
+                 aux = uhWBp(k,j+1)
+            end if
+            ! Horizontal advection Upwind differencing
             vhbdry = (vhWB(k,j)+vhWBpp(k,j))/2.
             IF (auxhWBpp(k,j)>ZERO) THEN
                vbdry  = vhWBpp(k,j)/auxhWBpp(k,j)
@@ -3194,7 +3194,7 @@ SUBROUTINE MODexmom4openBCY
             vN = vhp(k,        l  ) +vhp(k,lNC(l))
             vS = vhp(k,        l  ) +vhp(k,lSC(l))
             wU = wp (k,    lNC(l) ) +wp (k,    l )
-            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
             advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                 &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                 &    (uW+ABS(uW))* vbdry         -           &
@@ -3202,7 +3202,7 @@ SUBROUTINE MODexmom4openBCY
                 & +( (vN+ABS(vN))* vpp(k,    l ) +           &
             	&    (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                 &    (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
@@ -3216,18 +3216,18 @@ SUBROUTINE MODexmom4openBCY
                    & -  haypp(k,lSC(l))*(vpp(k,    l )-vpp(k,lSC(l))))/dydy        &
                    & + (haxpp(k,    l )*(vpp(k,lEC(l))-vpp(k,    l ))              &
                    & -  aux*(vpp(k,    l )-vbdry))/dxdx
-                   
+
             !.....Final explicit term.....
             ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv+cory-hdy)
-                
+
            END DO
          END DO
 
        ! ..... North boundary ......
        CASE (2)
-         
-         j  = jsbcH(no,ide_t)-1; 
-         is = isbcH(no,ide_t)  ; 
+
+         j  = jsbcH(no,ide_t)-1;
+         is = isbcH(no,ide_t)  ;
          ie = iebcH(no,ide_t)  ;
          !print *,"H:",ide_t,"j:",j
          !print *,"H:",ide_t,"is:",is,"ie:",ie
@@ -3248,10 +3248,10 @@ SUBROUTINE MODexmom4openBCY
            IF(nwlayers < 1) CYCLE
 
            ! Compute explicit term
-           ex(:,l) = 0.0	     
+           ex(:,l) = 0.0
            DO k = k1y,kmy
-                                                                 
-            ! Horizontal advection Upwind differencing 
+
+            ! Horizontal advection Upwind differencing
             vhbdry = (vhNB(k,i)+vhNBpp(k,i))/2.
             IF (hvNBpp(k,i)>ZERO) THEN
                vbdry  = vhNBpp(k,i)/hvNBpp(k,i)
@@ -3263,7 +3263,7 @@ SUBROUTINE MODexmom4openBCY
             vN = vhp(k,        l  ) +vhbdry
             vS = vhp(k,        l  ) +vhp(k,lSC(l))
             wU = wp (k,    lNC(l) ) +wp (k,    l )
-            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
             advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                 &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                 &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3271,7 +3271,7 @@ SUBROUTINE MODexmom4openBCY
                 & +( (vN+ABS(vN))* vpp(k,    l ) +           &
             	&    (vN-ABS(vN))* vbdry         -           &
                 &    (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
@@ -3282,7 +3282,7 @@ SUBROUTINE MODexmom4openBCY
             cory = 0.25 * f * (uhp(k,     lNC(l) ) + uhp(k,    l )       &  !MAC NESTING
                   &           +uhp(k, lWC(lNC(l))) + uhp(k,lWC(l)))
 
-            haypp(k,l)=Ay0*MIN(hvNBpp(k,i),hvpp(k,l))   
+            haypp(k,l)=Ay0*MIN(hvNBpp(k,i),hvpp(k,l))
             hdy  =   (haypp(k,    l )*(vbdry-vpp(k,    l ))              &
                    & -  haypp(k,lSC(l))*(vpp(k,    l )-vpp(k,lSC(l))))/dydy        &
                    & + (haxpp(k,    l )*(vpp(k,lEC(l))-vpp(k,    l ))              &
@@ -3290,14 +3290,14 @@ SUBROUTINE MODexmom4openBCY
 
             !sumadvx=sumadvx+advy
                 !sumcorx=sumcorx+cory
-                !sumhdx=sumhdx+hdy                   
+                !sumhdx=sumhdx+hdy
             !.....Final explicit term.....
             ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv+cory-hdy)
             !print *,"vhNB:",vhNB(k,i),"vhNBpp:",vhNBpp(k,i),"hvNBpp:",hvNBpp(k,i)
             !print *,k,l
-                
+
            END DO
-           
+
                 !print *,"aqui no entro"
                 !print *,"vhpp:",sum(vhpp(:,l)),i,j
                 !print *,"advx:",sumadvx
@@ -3307,21 +3307,21 @@ SUBROUTINE MODexmom4openBCY
                 !sumadvx=0
                 !sumcorx=0
                 !sumhdx=0
-            
+
          END DO
 
-       ! ..... East boundary ...... 
+       ! ..... East boundary ......
        CASE (3)
 
-       i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t)  ; 
-         je = jebcH(no,ide_t)  ; 
+       i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t)  ;
+         je = jebcH(no,ide_t)  ;
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
 
-           
+
 
            ! Compute the layer number for the bottom wet u-pt
            !kmy = kmz(l)                          !MAC NESTING
@@ -3343,19 +3343,19 @@ SUBROUTINE MODexmom4openBCY
            ! Compute number of wet layers & skip for dry cells
            nwlayers = (kmy-k1y) + 1
            IF(nwlayers < 1) CYCLE
-           
+
            ! Compute explicit term
-           ex(:,l) = 0.0	     
+           ex(:,l) = 0.0
            DO k = k1y,kmy
-            !uhbdry = (uhEB(k,j)+uhEBpp(k,j))/2.        !MAC NESTING  
-            uhbdry = uhEBp(k,j)              
+            !uhbdry = (uhEB(k,j)+uhEBpp(k,j))/2.        !MAC NESTING
+            uhbdry = uhEBp(k,j)
             if(j .EQ. je) THEN
                 aux = uhp(k,lm1)
             else
                 !aux = (uhEB(k,j+1)+uhEBpp(k,j+1))/2.
-                aux = uhEBp(k,j+1)   
-            end if                                                       
-            ! Horizontal advection Upwind differencing 
+                aux = uhEBp(k,j+1)
+            end if
+            ! Horizontal advection Upwind differencing
             vhbdry = (vhEB(k,j)+vhEBpp(k,j))/2.
             IF (auxhEBpp(k,j)>ZERO) THEN
                vbdry  = vhEBpp(k,j)/auxhEBpp(k,j)
@@ -3367,7 +3367,7 @@ SUBROUTINE MODexmom4openBCY
             vN = vhp(k,        l  ) +vhp(k,lNC(l))
             vS = vhp(k,        l  ) +vhp(k,lSC(l))
             wU = wp (k,    lNC(l) ) +wp (k,    l )
-            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
             advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                 &    (uE-ABS(uE))* vbdry         -           &
                 &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3375,7 +3375,7 @@ SUBROUTINE MODexmom4openBCY
                 & +( (vN+ABS(vN))* vpp(k,    l ) +           &
             	&    (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                 &    (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind for near bdry. cells
             advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
@@ -3391,18 +3391,18 @@ SUBROUTINE MODexmom4openBCY
                    & -  haypp(k,lSC(l))*(vpp(k,    l )-vpp(k,lSC(l))))/dydy        &
                    & + (haxpp(k,    l )*(vbdry-vpp(k,    l ))              &
                    & -  haxpp(k,lWC(l))*(vpp(k,    l )-vpp(k,lWC(l))))/dxdx
-                   
+
             !.....Final explicit term.....
             ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv+cory-hdy)
-                
+
            END DO
          END DO
 
        ! ..... South boundary ......
        CASE (4)
 
-         j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+         j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
 
@@ -3421,10 +3421,10 @@ SUBROUTINE MODexmom4openBCY
            IF(nwlayers < 1) CYCLE
 
            ! Compute explicit term
-           ex(:,l) = 0.0	     
+           ex(:,l) = 0.0
            DO k = k1y,kmy
-                                                                 
-            ! Horizontal advection Upwind differencing 
+
+            ! Horizontal advection Upwind differencing
             vhbdry = (vhSB(k,i)+vhSBpp(k,i))/2.
             IF (hvSBpp(k,i)>ZERO) THEN
                vbdry  = vhSBpp(k,i)/hvSBpp(k,i)
@@ -3436,7 +3436,7 @@ SUBROUTINE MODexmom4openBCY
             vN = vhp(k,    lNC(l) ) +vhp(k,    l )
             vS = vhp(k,        l  ) +vhbdry
             wU = wp (k,    lNC(l) ) +wp (k,    l )
-            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+            wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
             advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                 &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                 &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3444,7 +3444,7 @@ SUBROUTINE MODexmom4openBCY
                 & +( (vN+ABS(vN))* vpp(k,    l ) +           &
             	&    (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                 &    (vS+ABS(vS))* vbdry         -           &
-                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+                &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
             ! Vertical advection - Upwind in near bdry. cells
             advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
@@ -3455,17 +3455,17 @@ SUBROUTINE MODexmom4openBCY
             cory = 0.25 * f * (uhp(k,     lNC(l) ) + uhp(k,    l )       &  !MAC NESTING
                   &           +uhp(k, lWC(lNC(l))) + uhp(k,lWC(l)))
 
-            aux=Ay0*MIN(hvSBpp(k,i),hvpp(k,l)) 
+            aux=Ay0*MIN(hvSBpp(k,i),hvpp(k,l))
             hdy  =   (haypp(k,    l )*(vpp(k,lNC(l))-vpp(k,    l ))              &
                    & -  aux*(vpp(k,    l )-vbdry))/dydy        &
                    & + (haxpp(k,    l )*(vpp(k,lEC(l))-vpp(k,    l ))              &
                    & -  haxpp(k,lWC(l))*(vpp(k,    l )-vpp(k,lWC(l))))/dxdx
-                   
+
             !.....Final explicit term.....
             ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv+cory-hdy)
-                
+
            END DO
-         END DO 
+         END DO
 
        END SELECT
 
@@ -3478,14 +3478,14 @@ SUBROUTINE MODexmom4openBCY
        ! ..... West boundary ......
        CASE (1)
 
-         i  = isbc(no); 
-         j  = jsbc(no); 
+         i  = isbc(no);
+         j  = jsbc(no);
          ks = iebc(no);
          ke = jebc(no);
 
          ! Compute explicit term (use only advection) for v-points
 		 ! to the North of a water column with EW flow specified
-         IF (mask2d(i,j+1)) THEN 
+         IF (mask2d(i,j+1)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j);
@@ -3494,16 +3494,16 @@ SUBROUTINE MODexmom4openBCY
            ex(ks:ke,l) = 0.0
 
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              uhbdry = (uhWBpp(k,j)+uhWB  (k,j))/2.
-             ! ubdry  =  uhWBpp(k,j)/huWBpp(k,j) 
+             ! ubdry  =  uhWBpp(k,j)/huWBpp(k,j)
              uE = uhp(k,    lNC(l) ) +uhp(k  ,    l )
              uW = uhp(k,lWC(lNC(l))) +uhbdry
              vN = vhp(k,    lNC(l) ) +vhp(k  ,    l )
              vS = vhp(k,    lSC(l) ) +vhp(k  ,    l )
              wU = wp (k,    lNC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )
              advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                       (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                       (uW+ABS(uW))* vpp(k,lWC(l)) -           & !30062008
@@ -3511,42 +3511,42 @@ SUBROUTINE MODexmom4openBCY
                    +( (vN+ABS(vN))* vpp(k,    l ) +           &
                       (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                       (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy   
+                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                         (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * vpp(k+1,l) +           &
                         (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-               
+
            END DO
 
          ENDIF
 
          ! Compute explicit term (use only advection) for v-points
 		 ! to the South of a water column with EW flow specified
-         IF (mask2d(i,j-1)) THEN 
+         IF (mask2d(i,j-1)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j-1);
- 
+
            ! Compute explicit term (use only advection)
            ex(ks:ke,l) = 0.0
 
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              uhbdry = (uhWBpp(k,j)+uhWB  (k,j))/2.
-             ! ubdry  =  uhWBpp(k,j)/huWBpp(k,j) 
+             ! ubdry  =  uhWBpp(k,j)/huWBpp(k,j)
              uE = uhp(k,    lNC(l) ) +uhp(k  ,    l )
              uW = uhp(k,    lWC(l) ) +uhbdry
              vN = vhp(k,    lNC(l) ) +vhp(k  ,    l )
              vS = vhp(k,    lSC(l) ) +vhp(k  ,    l )
              wU = wp (k,    lNC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )
              advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                       (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                       (uW+ABS(uW))* vpp(k,lWC(l)) -           & !30062008
@@ -3554,35 +3554,35 @@ SUBROUTINE MODexmom4openBCY
                    +( (vN+ABS(vN))* vpp(k,    l ) +           &
                       (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                       (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy   
+                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                         (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * vpp(k+1,l) +           &
                         (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-                
+
            END DO
 
-         ENDIF 
+         ENDIF
 
        ! ..... North boundary ......
        CASE (2)
-         
-         j  = jsbc(no)-1; 
-         i  = isbc(no); 
+
+         j  = jsbc(no)-1;
+         i  = isbc(no);
          ks = iebc(no);
-         ke = jebc(no); 
+         ke = jebc(no);
          l = ij2l(i,j);
 
          ! Compute explicit term
-         ex(ks:ke,l) = 0.0	     
+         ex(ks:ke,l) = 0.0
          DO k = ks,ke
-                                                                 
-           ! Horizontal advection Upwind differencing 
+
+           ! Horizontal advection Upwind differencing
            vhbdry = (vhNB(k,i)+vhNBpp(k,i))/2.
            vbdry  = vhNBpp(k,i)/hvNBpp(k,i)
            uE = uhp(k,    lNC(l) ) +uhp(k,    l )
@@ -3590,7 +3590,7 @@ SUBROUTINE MODexmom4openBCY
            vN = vhp(k,        l  ) +vhbdry
            vS = vhp(k,        l  ) +vhp(k,lSC(l))
            wU = wp (k,    lNC(l) ) +wp (k,    l )
-           wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+           wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
            advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3598,30 +3598,30 @@ SUBROUTINE MODexmom4openBCY
                & +( (vN+ABS(vN))* vpp(k,    l ) +           &
                &    (vN-ABS(vN))* vbdry         -           &
                &    (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-               &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+               &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
            ! Vertical advection - Upwind for near bdry. cells
            advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                       (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                     -((wD+ABS(wD)) * vpp(k+1,l) +           &
                       (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-                   
+
            !.....Final explicit term.....
            ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-                
+
          END DO
 
        ! ..... East boundary ......
        CASE (3)
 
-         i  = isbc(no); 
-         j  = jsbc(no); 
+         i  = isbc(no);
+         j  = jsbc(no);
          ks = iebc(no);
          ke = jebc(no);
 
          ! Compute explicit term (use only advection) for v-points
 		 ! to the North of a water column with EW flow specified
-         IF (mask2d(i,j+1)) THEN 
+         IF (mask2d(i,j+1)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j);
@@ -3630,16 +3630,16 @@ SUBROUTINE MODexmom4openBCY
            ex(ks:ke,l) = 0.0
 
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              uhbdry = (uhEBpp(k,j)+uhEB  (k,j))/2.
-             ! ubdry  =  uhEBpp(k,j)/huEBpp(k,j) 
+             ! ubdry  =  uhEBpp(k,j)/huEBpp(k,j)
              uE = uhp(k,    lNC(l) ) +uhbdry
              uW = uhp(k,lWC(lNC(l))) +uhp(k  ,lWC(l))
              vN = vhp(k,    lNC(l) ) +vhp(k  ,    l )
              vS = vhp(k,    lSC(l) ) +vhp(k  ,    l )
              wU = wp (k,    lNC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )
              advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                       (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                       (uW+ABS(uW))* vpp(k,lWC(l)) -           & !30062008
@@ -3647,42 +3647,42 @@ SUBROUTINE MODexmom4openBCY
                    +( (vN+ABS(vN))* vpp(k,    l ) +           &
                       (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                       (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy   
+                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                         (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * vpp(k+1,l) +           &
                         (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-               
+
            END DO
 
          ENDIF
 
          ! Compute explicit term (use only advection) for v-points
 		 ! to the South of a water column with EW flow specified
-         IF (mask2d(i,j-1)) THEN 
+         IF (mask2d(i,j-1)) THEN
 
            ! ... Map (i,j) into l-index
            l = ij2l(i,j-1);
- 
+
            ! Compute explicit term (use only advection)
            ex(ks:ke,l) = 0.0
 
            DO k = ks,ke
-                                                                   
-             ! Horizontal advection - Upwind differencing  
+
+             ! Horizontal advection - Upwind differencing
              uhbdry = (uhEBpp(k,j)+uhEB  (k,j))/2.
-             ! ubdry  =  uhEBpp(k,j)/huEBpp(k,j) 
+             ! ubdry  =  uhEBpp(k,j)/huEBpp(k,j)
              uE = uhp(k,        l  ) +uhbdry
              uW = uhp(k,lWC(lNC(l))) +uhp(k  ,lWC(l))
              vN = vhp(k,    lNC(l) ) +vhp(k  ,    l )
              vS = vhp(k,    lSC(l) ) +vhp(k  ,    l )
              wU = wp (k,    lNC(l) ) +wp (k  ,    l )
-             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )        
+             wD = wp (k+1,  lNC(l) ) +wp (k+1,    l )
              advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                       (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                       (uW+ABS(uW))* vpp(k,lWC(l)) -           & !30062008
@@ -3690,35 +3690,35 @@ SUBROUTINE MODexmom4openBCY
                    +( (vN+ABS(vN))* vpp(k,    l ) +           &
                       (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                       (vS+ABS(vS))* vpp(k,lSC(l)) -           &
-                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy   
+                      (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
              ! Vertical advection - Upwind for near bdry. cells
              advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                         (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                       -((wD+ABS(wD)) * vpp(k+1,l) +           &
                         (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-			      		                                  
+
              !.....Final explicit term.....
              ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-                
+
            END DO
 
-         ENDIF 
+         ENDIF
 
        ! ..... South boundary ......
        CASE (4)
 
-         j  = jsbc(no); 
-         i  = isbc(no); 
+         j  = jsbc(no);
+         i  = isbc(no);
          ks = iebc(no);
          ke = jebc(no);
          l = ij2l(i,j);
 
          ! Compute explicit term
-         ex(ks:ke,l) = 0.0	     
+         ex(ks:ke,l) = 0.0
          DO k = ks,ke
-                                                                 
-           ! Horizontal advection Upwind differencing 
+
+           ! Horizontal advection Upwind differencing
            vhbdry = (vhSB(k,i)+vhSBpp(k,i))/2.
            vbdry  =  vhSBpp(k,i)/hvSBpp(k,i)
            uE = uhp(k,    lNC(l) ) +uhp(k,    l )
@@ -3726,7 +3726,7 @@ SUBROUTINE MODexmom4openBCY
            vN = vhp(k,    lNC(l) ) +vhp(k,    l )
            vS = vhp(k,        l  ) +vhbdry
            wU = wp (k,    lNC(l) ) +wp (k,    l )
-           wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )        
+           wD = wp (k+1,  lNC(l) ) +wp (k+1  ,l )
            advy = ( (uE+ABS(uE))* vpp(k,    l ) +           &
                &    (uE-ABS(uE))* vpp(k,lEC(l)) -           &
                &    (uW+ABS(uW))* vpp(k,lWC(l)) -           &
@@ -3734,28 +3734,28 @@ SUBROUTINE MODexmom4openBCY
                & +( (vN+ABS(vN))* vpp(k,    l ) +           &
                &    (vN-ABS(vN))* vpp(k,lNC(l)) -           &
                &    (vS+ABS(vS))* vbdry         -           &
-               &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy  
+               &    (vS-ABS(vS))* vpp(k,    l ) ) / fourdy
 
            ! Vertical advection - Upwind in near bdry. cells
            advy=advy+((wU+ABS(wU)) * vpp(k  ,l) +           &
                       (wU-ABS(wU)) * vpp(k-1,l)) / 4.       &
                     -((wD+ABS(wD)) * vpp(k+1,l) +           &
                       (wD-ABS(wD)) * vpp(k  ,l)) / 4.
-                   
+
            !.....Final explicit term.....
            ex(k,l) = vhpp(k,l) - twodt1*(advy*iadv)
-                
-         END DO 
+
+         END DO
 
        END SELECT
      END SELECT
    END DO
- 
+
 
 END SUBROUTINE MODexmom4openBCY
 
 !************************************************************************
-SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx) 
+SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
 !************************************************************************
 !
 !  Purpose: !MAC NESTING
@@ -3797,31 +3797,31 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
        ! ..... West boundary ......
        CASE (1)
 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t)
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
            ! ... Cycle if E-column is dry
            IF (.NOT. mask2d(i+1,j)) CYCLE
-           
-      
-                
-           
+
+
+
+
          END DO
 
        ! ..... North boundary ......
        CASE (2)
 
-       j  = jsbcH(no,ide_t); 
-       is = isbcH(no,ide_t); 
+       j  = jsbcH(no,ide_t);
+       is = isbcH(no,ide_t);
        ie = iebcH(no,ide_t)
        DO i = is, ie
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
            ! ... Cycle if E-column is dry
            IF (.NOT. mask2d(i+1,j)) CYCLE
            ! ... Compute the layer number for top & bottom wet u-pt
@@ -3887,7 +3887,7 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
             gg(k1x:kmx) = ex(k1x:kmx,l)                                       &
                          -hh(k1x:kmx  ) * (bclncx(k1x:kmx)+wsx0) * tz         &
                          +vdiffx(k1x:kmx)                        * tz
-            
+
             !.....Form [aa]  matrix............................................
             SELECT CASE (nwlayers)
             CASE (1)    ! Single wet layer
@@ -3909,7 +3909,7 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
 
             ! ... Top boundary conditions......................................
             ! a. Form wind stress term
-            
+
             IF (hvNBp(k1v(l),i)>ZERO) THEN
                vbdry  = vhNBp(k1v(l),i)/hvNBp(k1v(l),i)
             ELSE
@@ -3943,7 +3943,7 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
             ! b. Modify [aa] matrix
             aa(2,kmx)   = aa(2,kmx) + taubx*twodt1
 
-            
+
             !if(j .EQ. jsbc(1) .AND. i <= iebc(1) .AND. i >= isbc(1)) THEN
                 !print *,"aqui no entro"
             !    print *,"ex:",sum(ex(k1x:kmx,l)),i,j
@@ -3958,7 +3958,7 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
             !    print *,"rhopx(k1x):",rhopx(k1x)
             !    print *,"uair(l):",uair(l)
             !    print *,"aa2:",sum(aa(2,k1x:kmx))
-                
+
             !end if
 
             !.....Solve tridiagonal system for  [ag]  and  [ar]  arrays........
@@ -3983,25 +3983,25 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
        ! ..... East boundary ......
        CASE (3)
 
-         i  = isbcH(no,ide_t)-1; 
-         js = jsbcH(no,ide_t)  ; 
-         je = jebcH(no,ide_t)  ; 
+         i  = isbcH(no,ide_t)-1;
+         js = jsbcH(no,ide_t)  ;
+         je = jebcH(no,ide_t)  ;
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
            ! ... Cycle if E-column is dry
            IF (.NOT. mask2d(i+1,j)) CYCLE
-           
-         ENDDO           
+
+         ENDDO
 
        ! ..... South boundary ......
 
        CASE (4)
 
-       j  = jsbcH(no,ide_t); 
+       j  = jsbcH(no,ide_t);
 
-         is = isbcH(no,ide_t); 
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
 
@@ -4126,7 +4126,7 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
             ! b. Modify [aa] matrix
             aa(2,kmx)   = aa(2,kmx) + taubx*twodt1
 
-            
+
 
 
             !.....Solve tridiagonal system for  [ag]  and  [ar]  arrays........
@@ -4151,10 +4151,10 @@ SUBROUTINE MODmatmom4openBCX(Bstart,Bend,Beagx,Bearx,Bagx,Barx)
        END SELECT
       END SELECT
    END DO
-END SUBROUTINE MODmatmom4openBCX 
+END SUBROUTINE MODmatmom4openBCX
 
 !************************************************************************
-SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary) 
+SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
 !************************************************************************
 !
 !  Purpose: !MAC NESTING
@@ -4196,13 +4196,13 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
        ! ..... West boundary ......
        CASE (1)
 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t)
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
            ! ... Cycle if N-column is dry
            IF ( .NOT. mask2d(i,j+1) ) CYCLE
            ! ... Compute layer numbers of wet v-pt
@@ -4284,7 +4284,7 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
                           -(hvp(k1y-1:kmy-1,l)/hvp(k1y:kmy,l))*aa(1,k1y:kmy)  &
                           -(hvp(k1y+1:kmy+1,l)/hvp(k1y:kmy,l))*aa(3,k1y:kmy)
             END SELECT
-            
+
             IF (huWBp(k1u(l),j)>ZERO) THEN
                ubdry  = uhWBp(k1u(l),j)/huWBp(k1u(l),j)
             ELSE
@@ -4330,7 +4330,7 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
               CALL tridNBC ( aa, gg, hh, ag, ar, k1y, kmy, km1, nwlayers )
             END SELECT
 
-            
+
 
             !.....Save  [ag]  and  [ar]  arrays and sum them over
             !     depth for use in solution of continuity equation..............
@@ -4338,20 +4338,20 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
             Bary(k1y:kmy,l) = ar(k1y:kmy)
             Beagy(l) = SUM(ag(k1y:kmy))
             Beary(l) = SUM(ar(k1y:kmy))
-                
-           
+
+
          END DO
 
        ! ..... North boundary ......
        CASE (2)
 
-       j  = jsbcH(no,ide_t)-1; 
-       is = isbcH(no,ide_t); 
+       j  = jsbcH(no,ide_t)-1;
+       is = isbcH(no,ide_t);
        ie = iebcH(no,ide_t)
        DO i = is, ie
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
            ! ... Cycle if N-column is dry
            IF ( .NOT. mask2d(i,j+1) ) CYCLE
            !print *,"Beagy:",Beagy(l),"Beary:",Beary(l),l
@@ -4360,13 +4360,13 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
        ! ..... East boundary ......
        CASE (3)
 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t)  ; 
-         je = jebcH(no,ide_t)  ; 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t)  ;
+         je = jebcH(no,ide_t)  ;
          DO j = js, je
 
            ! ... Map (i,j) into l-index
-           l = ij2l(i,j); 
+           l = ij2l(i,j);
            ! ... Cycle if N-column is dry
            IF ( .NOT. mask2d(i,j+1) ) CYCLE
            ! ... Compute layer numbers of wet v-pt
@@ -4448,7 +4448,7 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
                           -(hvp(k1y-1:kmy-1,l)/hvp(k1y:kmy,l))*aa(1,k1y:kmy)  &
                           -(hvp(k1y+1:kmy+1,l)/hvp(k1y:kmy,l))*aa(3,k1y:kmy)
             END SELECT
-            
+
             IF (huEBp(k1u(l),j)>ZERO) THEN
                ubdry  = uhEBp(k1u(l),j)/huEBp(k1u(l),j)
             ELSE
@@ -4494,7 +4494,7 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
               CALL tridNBC ( aa, gg, hh, ag, ar, k1y, kmy, km1, nwlayers )
             END SELECT
 
-            
+
 
             !.....Save  [ag]  and  [ar]  arrays and sum them over
             !     depth for use in solution of continuity equation..............
@@ -4502,13 +4502,13 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
             Bary(k1y:kmy,l) = ar(k1y:kmy)
             Beagy(l) = SUM(ag(k1y:kmy))
             Beary(l) = SUM(ar(k1y:kmy))
-         ENDDO           
+         ENDDO
 
        ! ..... South boundary ......
        CASE (4)
 
-       j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+       j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
 
@@ -4516,7 +4516,7 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
            l = ij2l(i,j);
            ! ... Cycle if N-column is dry
            IF ( .NOT. mask2d(i,j+1) ) CYCLE
-           
+
          END DO
 
        END SELECT
@@ -4525,14 +4525,14 @@ SUBROUTINE MODmatmom4openBCY(Bstart,Bend,Beagy,Beary,Bagy,Bary)
 END SUBROUTINE MODmatmom4openBCY
 
 !************************************************************************
-SUBROUTINE MODvel4openBC 
+SUBROUTINE MODvel4openBC
 !************************************************************************
 !
 !  Purpose: To adjust the velocity estimates provided by the code at time
 !           n+1, for the presence of open boundaries
 !
 !------------------------------------------------------------------------
- 
+
    !.....Local variables.....
    INTEGER :: i, j, k, l, nn, is, ie, js, je, ks, ke, m, kms,no,ide_t
    REAL    :: deltaU,dru
@@ -4543,55 +4543,55 @@ SUBROUTINE MODvel4openBC
    DO nn = 1, nopenH(ide_t)
       no = noh2no(nn,ide_t)
       SELECT CASE ( itype(no) )
- 
+
       !....... Case 1 -- wse specified.....................................
       CASE (1)
-         
+
          SELECT CASE ( iside(no) )
 
          ! ... West boundary
          CASE (1)
             i = isbcH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
-            
+
             DO j = js, je
               l = ij2l(i,j)
               vh (:,l) = 0.0;
-              wp (:,l) = wp(:, lEC(l));   
-                            
-            ENDDO           
+              wp (:,l) = wp(:, lEC(l));
+
+            ENDDO
 
          ! ... North boundary
          CASE (2)
             j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
-            
+
             DO i = is, ie
               l = ij2l(i,j)
               uh (:,l) = 0.0
               wp (:,l) = wp(:,lSC(l));
-               
-            ENDDO           
+
+            ENDDO
 
          ! ... East boundary
          CASE (3)
             i = isbcH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
-            
+
             DO j = js, je
               l  = ij2l(i,j)
               vh (:,l) = 0.0;
-              wp (:,l) = wp(:, lWC(l)); 
-                
-            ENDDO           
- 
+              wp (:,l) = wp(:, lWC(l));
+
+            ENDDO
+
          ! ... South boundary
          CASE (4)
             j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
-            
+
             DO i = is, ie
               l = ij2l(i,j)
               uh (:,l) = 0.0
               wp (:,l) = wp(:,lNC(l));
-                
-            ENDDO           
+
+            ENDDO
 
          END SELECT
 
@@ -4600,29 +4600,29 @@ SUBROUTINE MODvel4openBC
 
          SELECT CASE ( iside(no) )
 
-         ! ... West boundary 
+         ! ... West boundary
          CASE (1)
            i = isbcHH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
            DO j = js, je
-             l   = ij2l(i,j)         
-             kms = kmz(l); 
+             l   = ij2l(i,j)
+             kms = kmz(l);
              wp(kms+1,l) = 0.0
              dru = 0.0
              DO k = kms,k1,-1
                dru = dru - (-uhWB  (k,j)         &
                             -uhWBpp(k,j))/twodx
-               wp(k,l) = wp(k,l) + dru 
+               wp(k,l) = wp(k,l) + dru
 
 
-             END DO           
-            ENDDO           
+             END DO
+            ENDDO
 
          ! ... North boundary
          CASE (2)
             j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
             DO i = is, ie
-             l   = ij2l(i,j)         
-             kms = kmz(l); 
+             l   = ij2l(i,j)
+             kms = kmz(l);
              wp(kms+1,l) = 0.0
              dru = 0.0
              DO k = kms,k1,-1
@@ -4631,40 +4631,40 @@ SUBROUTINE MODvel4openBC
                wp(k,l) = wp(k,l) + dru
 
 
-             END DO           
-            ENDDO           
+             END DO
+            ENDDO
 
          ! ... East boundary
          CASE (3)
             i = isbcHH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t)
             DO j = js, je
-             l   = ij2l(i,j)         
-             kms = kmz(l); 
+             l   = ij2l(i,j)
+             kms = kmz(l);
              wp(kms+1,l) = 0.0
              dru = 0.0
               DO k = kms,k1,-1
                 dru = dru -(uhEB  (k,j) +       &
                             uhEBpp(k,j))/twodx
-                wp(k,l) = wp(k,l) + dru    
+                wp(k,l) = wp(k,l) + dru
 
 
-              ENDDO                    
+              ENDDO
             ENDDO
 
          ! ... South boundary
          CASE (4)
             j = jsbcH(no,ide_t); is = isbcHH(no,ide_t); ie = iebcHH(no,ide_t)
             DO i = is, ie
-             l   = ij2l(i,j)         
-             kms = kmz(l); 
+             l   = ij2l(i,j)
+             kms = kmz(l);
              wp(kms+1,l) = 0.0
              dru = 0.0
               DO k = kms,k1,-1
-                dru = dru -(-vhSB  (k,i) +     & 
-                            -vhSBpp(k,i))/twody; 
+                dru = dru -(-vhSB  (k,i) +     &
+                            -vhSBpp(k,i))/twody;
                 wp(k,l) = wp(k,l) + dru
-             ENDDO 
-            ENDDO          
+             ENDDO
+            ENDDO
 
          END SELECT
 
@@ -4673,65 +4673,65 @@ SUBROUTINE MODvel4openBC
 
          SELECT CASE ( iside(no) )
 
-         ! ... West boundary 
+         ! ... West boundary
          CASE (1)
 
-           i  = isbc(no); 
+           i  = isbc(no);
            j  = jsbc(no);
-           ks = iebc(no); 
-           ke = jebc(no); 
-           l  = ij2l(i,j)         
+           ks = iebc(no);
+           ke = jebc(no);
+           l  = ij2l(i,j)
            DO k = ks, ke
              deltaU = (uhWB(k,j)+uhWBpp(k,j))/twodx
              DO kms = k1, k
-               wp(kms,l) = wp(kms,l)+deltaU                         
+               wp(kms,l) = wp(kms,l)+deltaU
              END DO
            END DO
 
          ! ... North boundary
          CASE (2)
 
-           i  = isbc(no); 
-           j  = jsbc(no); 
-           ks = iebc(no); 
+           i  = isbc(no);
+           j  = jsbc(no);
+           ks = iebc(no);
            ke = jebc(no);
-           l  = ij2l(i,j)        
+           l  = ij2l(i,j)
            DO k = ks, ke
              deltaU = (vhNB(k,i)+vhNBpp(k,i))/twody
              DO kms = k1, k
                wp(kms,l) = wp(kms,l)-deltaU
-             END DO    
-           END DO           
+             END DO
+           END DO
 
          ! ... East boundary
          CASE (3)
 
-           i  = isbc(no); 
-           j  = jsbc(no); 
-           ks = iebc(no); 
-           ke = jebc(no); 
-           l  = ij2l(i,j) 
+           i  = isbc(no);
+           j  = jsbc(no);
+           ks = iebc(no);
+           ke = jebc(no);
+           l  = ij2l(i,j)
            DO k = ks, ke
              deltaU = (uhEB(k,j)+uhEBpp(k,j))/twodx
              DO kms = k1, k
-               wp(kms,l) = wp(kms,l)-deltaU   
+               wp(kms,l) = wp(kms,l)-deltaU
              END DO
            END DO
 
          ! ... South boundary
          CASE (4)
 
-           i  = isbc(no); 
-           j  = jsbc(no); 
-           ks = iebc(no); 
+           i  = isbc(no);
+           j  = jsbc(no);
+           ks = iebc(no);
            ke = jebc(no);
            l  = ij2l(i,j)
            DO k = ks, ke
              deltaU = (vhSB(k,i)+vhSBpp(k,i))/twody
              DO kms = k1, k
                wp(kms,l) = wp(kms,l)+deltaU
-             END DO    
-           END DO           
+             END DO
+           END DO
 
          END SELECT
 
@@ -4744,8 +4744,8 @@ END SUBROUTINE MODvel4openBC
 SUBROUTINE openbcSCA(thrs)
 !************************************************************************
 !
-!  Purpose: To assign values of active scalars along open wse boundaries 
-!           at new (n+1) time level. 
+!  Purpose: To assign values of active scalars along open wse boundaries
+!           at new (n+1) time level.
 !
 !------------------------------------------------------------------------
 
@@ -4765,13 +4765,13 @@ SUBROUTINE openbcSCA(thrs)
 
      no = noh2no(nn,ide_t)
 
-     SELECT CASE ( itype(no) )      
- 
+     SELECT CASE ( itype(no) )
+
      !.....Case 1 -- scalar specified on a wse BC .........................
      CASE (1)
 
        !.....Get new boundary value of scalar.....
-       ! ... Set value of scalar at OpenBC nn - 
+       ! ... Set value of scalar at OpenBC nn -
        dthrs_sal = dtsecOpenBC/3600.
        salbc = parab(0.,thrs,varsOpenBC(no,2,:),dthrs_sal)
 
@@ -4780,9 +4780,9 @@ SUBROUTINE openbcSCA(thrs)
 
        ! ..... West boundary ......
        CASE (1)
- 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
 
@@ -4794,21 +4794,21 @@ SUBROUTINE openbcSCA(thrs)
 
            ! Compute explicit term (only using advection)
            DO k = k1s,kms
-                                                                   
-            ! Horizontal advection - Upwind differencing  
-            IF ( uh(k,l) > 0.0 .AND. salbc > 0) THEN 
+
+            ! Horizontal advection - Upwind differencing
+            IF ( uh(k,l) > 0.0 .AND. salbc > 0) THEN
               sal(k,l) = salbc
             ELSE
               sal(k,l) = sal(k,lEC(l))
-            ENDIF       
+            ENDIF
            ENDDO
          ENDDO
 
        ! ..... North boundary ......
        CASE (2)
- 
-         j  = jsbcH(no,ide_t); 
-         is = isbcHH(no,ide_t); 
+
+         j  = jsbcH(no,ide_t);
+         is = isbcHH(no,ide_t);
          ie = iebcHH(no,ide_t);
          DO i = is, ie
 
@@ -4820,10 +4820,10 @@ SUBROUTINE openbcSCA(thrs)
 
            ! Compute explicit term (only using advection)
            DO k = k1s,kms
-                                                                   
-            ! Horizontal advection - Upwind differencing  
-            IF ( vh(k,lSC(l)) < 0.0 .AND. salbc > 0) THEN 
-              sal(k,l) = salbc 
+
+            ! Horizontal advection - Upwind differencing
+            IF ( vh(k,lSC(l)) < 0.0 .AND. salbc > 0) THEN
+              sal(k,l) = salbc
             ELSE
               sal(k,l) = sal(k,lSC(l))
             ENDIF
@@ -4833,9 +4833,9 @@ SUBROUTINE openbcSCA(thrs)
 
        ! ..... East boundary ......
        CASE (3)
- 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
 
@@ -4847,22 +4847,22 @@ SUBROUTINE openbcSCA(thrs)
 
            ! Compute explicit term (only using advection)
            DO k = k1s,kms
-                                                                   
-            ! Horizontal advection - Upwind differencing  
-            IF ( uh(k,lWC(l)) < 0.0 .AND. salbc > 0) THEN 
-              sal(k,l) = salbc  
+
+            ! Horizontal advection - Upwind differencing
+            IF ( uh(k,lWC(l)) < 0.0 .AND. salbc > 0) THEN
+              sal(k,l) = salbc
             ELSE
               sal(k,l) = sal(k,lWC(l))
-            ENDIF       
+            ENDIF
 
            ENDDO
          ENDDO
 
        ! ..... South boundary ......
        CASE (4)
- 
-         j  = jsbcH(no,ide_t); 
-         is = isbcHH(no,ide_t); 
+
+         j  = jsbcH(no,ide_t);
+         is = isbcHH(no,ide_t);
          ie = iebcHH(no,ide_t);
          DO i = is, ie
 
@@ -4874,10 +4874,10 @@ SUBROUTINE openbcSCA(thrs)
 
            ! Compute explicit term (only using advection)
            DO k = k1s,kms
-                                                                   
-            ! Horizontal advection - Upwind differencing  
-            IF ( vh(k,l) > 0.0 .AND. salbc > 0) THEN 
-              sal(k,l) = salbc  
+
+            ! Horizontal advection - Upwind differencing
+            IF ( vh(k,l) > 0.0 .AND. salbc > 0) THEN
+              sal(k,l) = salbc
             ELSE
               sal(k,l) = sal(k,lNC(l))
             ENDIF
@@ -4902,8 +4902,8 @@ END SUBROUTINE openbcSCA
 SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
 !************************************************************************
 !
-!  Purpose: Modifies the ex arrays in the scalar transport equation to 
-!           account for inflows/outflows. 
+!  Purpose: Modifies the ex arrays in the scalar transport equation to
+!           account for inflows/outflows.
 !
 !------------------------------------------------------------------------
 
@@ -4915,7 +4915,7 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
    REAL    :: salbc, dthrs_sal, uE, uW, vN, vS, scE, scW, scN, scS
    INTEGER :: i, j, k, l, ios, nn, is, ie, js, je, kms, k1s
    INTEGER :: icl, m1, m2, niNGB, nbid,no,ide_t
-   REAL    :: weight  
+   REAL    :: weight
 
    ide_t = omp_get_thread_num()+1
    ! ... Return if no open boundaries are specified
@@ -4929,8 +4929,8 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
 
      no = noh2no(nn,ide_t)
 
-     SELECT CASE ( itype(no) )      
- 
+     SELECT CASE ( itype(no) )
+
      !.....Case 1 -- scalar specified on wse BC.....
      CASE (1)
 
@@ -4940,7 +4940,7 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
      CASE (2)
 
        !.....Get new boundary value of scalar.....
-       ! ... Set value of scalar at OpenBC nn - 
+       ! ... Set value of scalar at OpenBC nn -
        dthrs_sal = dtsecOpenBC/3600.
        salbc = parab(0.,thrs,varsOpenBC(no,2,:),dthrs_sal)
 
@@ -4949,33 +4949,33 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
 
        ! ..... West boundary ......
        CASE (1)
- 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
            l = ij2l(i,j);
            kms = kmz(l)
            k1s = k1z(l)
-           DO k = k1s,kms                                                                 
+           DO k = k1s,kms
              ! ... Define velocity at boundary face
-             uW = uhWB(k,j) + uhWBpp(k,j);                               
-             ! ... Define scalar   at boundary face  
-             IF ( uW >= 0.0 .AND. salbc > 0) THEN 
-               scW = salbc  
+             uW = uhWB(k,j) + uhWBpp(k,j);
+             ! ... Define scalar   at boundary face
+             IF ( uW >= 0.0 .AND. salbc > 0) THEN
+               scW = salbc
              ELSE
                scW = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex- array 
+             ! ... Include boundary flux in ex- array
              Bex(k,l) = Bex(k,l) +  uW * scW / twodx
            ENDDO
          ENDDO
 
        ! ..... North boundary ......
        CASE (2)
- 
-         j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+
+         j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
            l = ij2l(i,j);
@@ -4983,23 +4983,23 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
            k1s = k1z(l)
            DO k = k1s,kms
              ! ... Define velocity at boundary face
-             vN = vhNB(k,i) + vhNBpp(k,i);                               
-             ! ... Define scalar   at boundary face  
-             IF ( vN < 0.0 .AND. salbc > 0) THEN 
-               scN = salbc  
+             vN = vhNB(k,i) + vhNBpp(k,i);
+             ! ... Define scalar   at boundary face
+             IF ( vN < 0.0 .AND. salbc > 0) THEN
+               scN = salbc
              ELSE
                scN = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  vN * scN / twody 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  vN * scN / twody
            ENDDO
          ENDDO
 
        ! ..... East boundary ......
        CASE (3)
- 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
            l = ij2l(i,j);
@@ -5007,23 +5007,23 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
            k1s = k1z(l)
            DO k = k1s,kms
              ! ... Define velocity at boundary face
-             uE = uhEB(k,j) + uhEBpp(k,j);                               
-             ! ... Define scalar   at boundary face  
-             IF ( uE < 0.0 .AND. salbc > 0) THEN 
-               scE = salbc  
+             uE = uhEB(k,j) + uhEBpp(k,j);
+             ! ... Define scalar   at boundary face
+             IF ( uE < 0.0 .AND. salbc > 0) THEN
+               scE = salbc
              ELSE
                scE = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  uE * scE / twodx 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  uE * scE / twodx
            ENDDO
          ENDDO
 
        ! ..... South boundary ......
        CASE (4)
- 
-         j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+
+         j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
            l = ij2l(i,j);
@@ -5031,14 +5031,14 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
            k1s = k1z(l)
            DO k = k1s,kms
              ! ... Define velocity at boundary face
-             vS = vhSB(k,i) + vhSBpp(k,i);                               
-             ! ... Define scalar   at boundary face  
-             IF ( vS > 0.0 .AND. salbc > 0) THEN 
-               scS = salbc  
+             vS = vhSB(k,i) + vhSBpp(k,i);
+             ! ... Define scalar   at boundary face
+             IF ( vS > 0.0 .AND. salbc > 0) THEN
+               scS = salbc
              ELSE
                scS = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex 
+             ! ... Include boundary flux in ex
              Bex(k,l) = Bex(k,l) +  vS * scS / twody
            ENDDO
          ENDDO
@@ -5049,7 +5049,7 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
      CASE (3)
 
        !.....Get new boundary value of scalar.....
-       ! ... Set value of scalar at OpenBC nn - 
+       ! ... Set value of scalar at OpenBC nn -
        dthrs_sal = dtsecOpenBC/3600.
        salbc = parab(0.,thrs,varsOpenBC(no,2,:),dthrs_sal)
 
@@ -5058,107 +5058,107 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
 
        ! ..... West boundary ......
        CASE (1)
- 
-         i  = isbc(no); 
-         js = jsbc(no); 
+
+         i  = isbc(no);
+         js = jsbc(no);
          je = jsbc(no);
          k1s= iebc(no);
          kms= jebc(no);
          DO j = js, je
            l = ij2l(i,j);
-           DO k = k1s,kms               
+           DO k = k1s,kms
              ! ... Define velocity at boundary face
-             uW = uhWB(k,j) + uhWBpp(k,j);                               
-             ! ... Define scalar   at boundary face  
+             uW = uhWB(k,j) + uhWBpp(k,j);
+             ! ... Define scalar   at boundary face
 
-             IF ( uW > 0.0 .AND. salbc > 0) THEN 
-               scW = salbc  
+             IF ( uW > 0.0 .AND. salbc > 0) THEN
+               scW = salbc
              ELSE
                scW = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex- array 
-             Bex(k,l) = Bex(k,l) +  uW * scW / twodx 
+             ! ... Include boundary flux in ex- array
+             Bex(k,l) = Bex(k,l) +  uW * scW / twodx
            ENDDO
          ENDDO
 
        ! ..... North boundary ......
        CASE (2)
 
-         j  = jsbc(no); 
-         is = isbc(no); 
+         j  = jsbc(no);
+         is = isbc(no);
          ie = isbc(no);
          k1s= iebc(no);
          kms= jebc(no);
          DO i = is, ie
            l = ij2l(i,j);
-           DO k = k1s,kms              
+           DO k = k1s,kms
              ! ... Define velocity at boundary face
-             vN = vhNB(k,i) + vhNBpp(k,i);                               
-             ! ... Define scalar   at boundary face  
-             IF ( vN < 0.0 .AND. salbc > 0) THEN 
-               scN = salbc  
+             vN = vhNB(k,i) + vhNBpp(k,i);
+             ! ... Define scalar   at boundary face
+             IF ( vN < 0.0 .AND. salbc > 0) THEN
+               scN = salbc
              ELSE
                scN = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  vN * scN / twody 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  vN * scN / twody
            ENDDO
          ENDDO
 
        ! ..... East boundary ......
        CASE (3)
- 
-         i  = isbc(no); 
-         js = jsbc(no); 
+
+         i  = isbc(no);
+         js = jsbc(no);
          je = jsbc(no);
          k1s= iebc(no);
          kms= jebc(no);
          DO j = js, je
            l = ij2l(i,j);
-           DO k = k1s,kms               
+           DO k = k1s,kms
              ! ... Define velocity at boundary face
-             uE = uhEB(k,j) + uhEBpp(k,j);                               
-             ! ... Define scalar   at boundary face  
-             IF ( uE < 0.0 .AND. salbc > 0) THEN 
-               scE = salbc  
+             uE = uhEB(k,j) + uhEBpp(k,j);
+             ! ... Define scalar   at boundary face
+             IF ( uE < 0.0 .AND. salbc > 0) THEN
+               scE = salbc
              ELSE
                scE = salpp(k,l)
              ENDIF
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  uE * scE / twodx 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  uE * scE / twodx
            ENDDO
          ENDDO
 
        ! ..... South boundary ......
        CASE (4)
 
-         i  = isbc(no); 
-         j  = jsbc(no); 
+         i  = isbc(no);
+         j  = jsbc(no);
          k1s= iebc(no);
          kms= jebc(no);
          l = ij2l(i,j);
-         DO k = k1s, kms              
+         DO k = k1s, kms
            ! ... Define velocity at boundary face
-           vS = vhSB(k,i) + vhSBpp(k,i);                               
-           ! ... Define scalar   at boundary face  
-           IF ( vS > 0.0 .AND. salbc > 0) THEN 
-             scS = salbc  
+           vS = vhSB(k,i) + vhSBpp(k,i);
+           ! ... Define scalar   at boundary face
+           IF ( vS > 0.0 .AND. salbc > 0) THEN
+             scS = salbc
            ELSE
              scS = salpp(k,l)
            ENDIF
-           ! ... Include boundary flux in ex 
-           Bex(k,l) = Bex(k,l) +  vS * scS / twody 
+           ! ... Include boundary flux in ex
+           Bex(k,l) = Bex(k,l) +  vS * scS / twody
          ENDDO
- 
+
        END SELECT
 
        ! ... Case 4 - Active scalars at nested boundaries .................
-       CASE (4) 
+       CASE (4)
 
          ! ... Counter of nested grid boundaries
          niNGB = niNGB + 1;
 
-         ! ... Define weighting coefficients for records 
+         ! ... Define weighting coefficients for records
          !weight  = (thrs - thrsNGBp(no))/(thrsNGB(no)-thrsNGBp(no))
          weight  = 1.0
 !         print *,"niNGB:",no,"thrs:",thrs,"thrsNGBp:",thrsNGBp
@@ -5168,77 +5168,77 @@ SUBROUTINE MODexsal4openbc(Bstart,Bend,Bex,thrs)
          CASE(1)
            i = isbcH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t);
            icl = 0
-           DO j = js, je; 
+           DO j = js, je;
              l   = ij2l(i,j)
              DO k = k1, kmz(l)
-             icl = icl + 1      
-             ! ... Define scalar at boundary face  
+             icl = icl + 1
+             ! ... Define scalar at boundary face
              !scW = scNGB (icl,niNGB)*    weight + & ! FJR??
              !      scNGBp(icl,niNGB)*(1.-weight) ! FJR ??
              scW = scNGB (icl,no)*    weight + &
-                   scNGBp(icl,no)*(1.-weight)            
+                   scNGBp(icl,no)*(1.-weight)
              ! ... Define velocity at boundary face
-             uW  = uhWB(k,j) + uhWBpp(k,j); 
-             ! ... Re eefine scalar at boundary face if needed                               
+             uW  = uhWB(k,j) + uhWBpp(k,j);
+             ! ... Re eefine scalar at boundary face if needed
              IF ( uW <= 0.0 ) scW = salpp(k,l)
-             ! ... Include boundary flux in ex- array 
+             ! ... Include boundary flux in ex- array
              Bex(k,l) = Bex(k,l) +  uW * scW / twodx
-           ENDDO; ENDDO 
+           ENDDO; ENDDO
          CASE(3)
            i = isbcH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t);
            icl = 0
-           DO j = js, je; 
+           DO j = js, je;
              l   = ij2l(i,j)
              DO k = k1, kmz(l)
-             icl = icl + 1 
-             ! ... Define scalar at boundary face  
+             icl = icl + 1
+             ! ... Define scalar at boundary face
              !scE = scNGB (icl,niNGB)*    weight + & FJR??
              !      scNGBp(icl,niNGB)*(1.-weight) FJR??
              scE = scNGB (icl,no)*    weight + &
-                   scNGBp(icl,no)*(1.-weight)            
+                   scNGBp(icl,no)*(1.-weight)
              ! ... Define velocity at boundary face
-             uE  = uhEB(k,j) + uhEBpp(k,j);                               
-             ! ... Redefine scalar at boundary face if needed 
+             uE  = uhEB(k,j) + uhEBpp(k,j);
+             ! ... Redefine scalar at boundary face if needed
              IF ( uE >= 0.0 ) scE = salpp(k,l)
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  uE * scE / twodx       
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  uE * scE / twodx
            ENDDO; ENDDO
          CASE(2)
            j = jsbcH(no,ide_t); is = isbcH(no,ide_t); ie = iebcH(no,ide_t);
            icl = siptNBI(no,ide_t) -1
-           DO i = is, ie; 
+           DO i = is, ie;
              l   = ij2l(i,j)
              DO k = k1, kmz(l)
-             icl = icl + 1      
-             ! ... Define scalar at boundary face  
+             icl = icl + 1
+             ! ... Define scalar at boundary face
              scN = scNGB (icl,no)*    weight + &
                    scNGBp(icl,no)*(1.-weight)
              ! ... Define velocity at boundary face
-             vN  = vhNB(k,i) + vhNBpp(k,i);                               
-             ! ... Redefine scalar at boundary face if needed  
+             vN  = vhNB(k,i) + vhNBpp(k,i);
+             ! ... Redefine scalar at boundary face if needed
              IF ( vN >= 0.0 ) scN = salpp(k,l)
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  vN * scN / twody 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  vN * scN / twody
            ENDDO; ENDDO
          CASE(4)
            j = jsbcH(no,ide_t); is = isbcH(no,ide_t); ie = iebcH(no,ide_t);
            icl = siptNBI(no,ide_t) -1
-           DO i = is, ie; 
+           DO i = is, ie;
              l   = ij2l(i,j)
              DO k = k1, kmz(l)
-             icl = icl + 1      
-             ! ... Define scalar at boundary face  
+             icl = icl + 1
+             ! ... Define scalar at boundary face
              scS = scNGB (icl,no)*    weight + &
                    scNGBp(icl,no)*(1.-weight)
              ! ... Define velocity at boundary face
-             vS  = vhSB(k,i) + vhSBpp(k,i);                               
-             ! ... Define scalar   at boundary face  
+             vS  = vhSB(k,i) + vhSBpp(k,i);
+             ! ... Define scalar   at boundary face
              IF ( vS <= 0.0 ) scS = salpp(k,l)
-             ! ... Include boundary flux in ex 
+             ! ... Include boundary flux in ex
              Bex(k,l) = Bex(k,l) +  vS * scS / twody
            ENDDO; ENDDO
 
-         END SELECT        
+         END SELECT
 
      END SELECT
 
@@ -5250,8 +5250,8 @@ END SUBROUTINE MODexsal4openbc
 SUBROUTINE openbcTracer (itr,thrs)
 !************************************************************************
 !
-!  Purpose: To assign values of active scalars along open wse boundaries 
-!           at new (n+1) time level. 
+!  Purpose: To assign values of active scalars along open wse boundaries
+!           at new (n+1) time level.
 !
 !------------------------------------------------------------------------
 
@@ -5275,13 +5275,13 @@ SUBROUTINE openbcTracer (itr,thrs)
    DO nn = 1, nopenH(ide_t)
      no = noh2no(nn,ide_t)
 
-     SELECT CASE ( itype(no) )      
- 
+     SELECT CASE ( itype(no) )
+
      !.....Case 1 -- scalar specified on a wse BC.....
      CASE (1)
 
        !.....Get new boundary value of scalar.....
-       ! ... Set value of scalar at OpenBC nn - 
+       ! ... Set value of scalar at OpenBC nn -
        dthrs_sal = dtsecOpenBC/3600.
        salbc = parab(0.,thrs,varsOpenBC(no,2+itr,:),dthrs_sal)
 
@@ -5290,9 +5290,9 @@ SUBROUTINE openbcTracer (itr,thrs)
 
        ! ..... West boundary ......
        CASE (1)
- 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
 
@@ -5302,21 +5302,21 @@ SUBROUTINE openbcTracer (itr,thrs)
            kms = kmz(l)
            k1s = k1z(l)
            ! Compute explicit term (only using advection)
-           DO k = k1s,kms                                                                 
-             ! Horizontal advection - Upwind differencing  
-             IF ( uh(k,l) > 0.0 .AND. salbc > 0.0) THEN 
-               tracer(k,l,itr) = salbc  
+           DO k = k1s,kms
+             ! Horizontal advection - Upwind differencing
+             IF ( uh(k,l) > 0.0 .AND. salbc > 0.0) THEN
+               tracer(k,l,itr) = salbc
              ELSE
                tracer(k,l,itr) = tracer(k,lEC(l),itr)
-             ENDIF       
+             ENDIF
            ENDDO
          ENDDO
 
        ! ..... North boundary ......
        CASE (2)
- 
-         j  = jsbcH(no,ide_t); 
-         is = isbcHH(no,ide_t); 
+
+         j  = jsbcH(no,ide_t);
+         is = isbcHH(no,ide_t);
          ie = iebcHH(no,ide_t);
          DO i = is, ie
            ! ... Map 3D into 2D array counter
@@ -5325,10 +5325,10 @@ SUBROUTINE openbcTracer (itr,thrs)
            kms = kmz(l)
            k1s = k1z(l)
            ! Compute explicit term (only using advection)
-           DO k = k1s,kms                                                                  
-             ! Horizontal advection - Upwind differencing  
-             IF ( vh(k,lSC(l)) < 0.0 .AND. salbc > 0.0) THEN 
-               tracer(k,l,itr) = salbc  
+           DO k = k1s,kms
+             ! Horizontal advection - Upwind differencing
+             IF ( vh(k,lSC(l)) < 0.0 .AND. salbc > 0.0) THEN
+               tracer(k,l,itr) = salbc
              ELSE
                tracer(k,l,itr) = tracer(k,lSC(l),itr)
              ENDIF
@@ -5337,9 +5337,9 @@ SUBROUTINE openbcTracer (itr,thrs)
 
        ! ..... East boundary ......
        CASE (3)
- 
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
            ! ... Map 3D into 2D array index
@@ -5348,21 +5348,21 @@ SUBROUTINE openbcTracer (itr,thrs)
            kms = kmz(l)
            k1s = k1z(l)
            ! Compute explicit term (only using advection)
-           DO k = k1s,kms                                                        
-             ! Horizontal advection - Upwind differencing  
-             IF ( uh(k,lWC(l)) < 0.0 .AND. salbc > 0.0) THEN 
-               tracer(k,l,itr) = salbc  
+           DO k = k1s,kms
+             ! Horizontal advection - Upwind differencing
+             IF ( uh(k,lWC(l)) < 0.0 .AND. salbc > 0.0) THEN
+               tracer(k,l,itr) = salbc
              ELSE
                tracer(k,l,itr) = tracer(k,lWC(l),itr)
-             ENDIF       
+             ENDIF
            ENDDO
          ENDDO
 
        ! ..... South boundary ......
        CASE (4)
- 
-         j  = jsbcH(no,ide_t); 
-         is = isbcHH(no,ide_t); 
+
+         j  = jsbcH(no,ide_t);
+         is = isbcHH(no,ide_t);
          ie = iebcHH(no,ide_t);
          DO i = is, ie
            ! ... Map 3D into 2D array index
@@ -5371,10 +5371,10 @@ SUBROUTINE openbcTracer (itr,thrs)
            kms = kmz(l)
            k1s = k1z(l)
            ! Compute explicit term (only using advection)
-           DO k = k1s,kms                                                               
-             ! Horizontal advection - Upwind differencing  
-             IF ( vh(k,l) > 0.0 .AND. salbc > 0.0) THEN 
-               tracer(k,l,itr) = salbc  
+           DO k = k1s,kms
+             ! Horizontal advection - Upwind differencing
+             IF ( vh(k,l) > 0.0 .AND. salbc > 0.0) THEN
+               tracer(k,l,itr) = salbc
              ELSE
                tracer(k,l,itr) = tracer(k,lNC(l),itr)
              ENDIF
@@ -5398,8 +5398,8 @@ END SUBROUTINE openbcTracer
 SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
 !************************************************************************
 !
-!  Purpose: Modifies the ex arrays in the scalar transport equation to 
-!           account for inflows/outflows. 
+!  Purpose: Modifies the ex arrays in the scalar transport equation to
+!           account for inflows/outflows.
 !
 !------------------------------------------------------------------------
 
@@ -5413,7 +5413,7 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
    REAL    :: salbc, dthrs_sal, uE, uW, vN, vS, scE, scW, scN, scS
    INTEGER :: i, j, k, l, ios, nn, is, ie, js, je, kms, k1s
    INTEGER :: icl, niNGB,ide_t,no
-   REAL    :: weight  
+   REAL    :: weight
 
    ide_t = omp_get_thread_num()+1
    ! ... Return if no open boundaries are specified
@@ -5425,17 +5425,17 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
    DO nn = 1, nopenH(ide_t)
      no = noh2no(nn,ide_t)
 
-     SELECT CASE ( itype(no) )      
+     SELECT CASE ( itype(no) )
 
-     CASE (1) 
+     CASE (1)
 
        CYCLE
- 
+
      !.....Case 2 -- scalar specified on free surface flow BC............
      CASE (2)
 
        !.....Get new boundary value of scalar.....
-       ! ... Set value of scalar at OpenBC nn - 
+       ! ... Set value of scalar at OpenBC nn -
        dthrs_sal = dtsecOpenBC/3600.
        salbc = parab(0.,thrs,varsOpenBC(no,2+itr,:),dthrs_sal)
 
@@ -5444,31 +5444,31 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
 
        ! ..... West boundary ......
        CASE (1)
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
            l = ij2l(i,j);
            kms = kmz(l)
            k1s = k1z(l)
-           DO k = k1s,kms                                                                 
+           DO k = k1s,kms
              ! ... Define velocity at boundary face
-             uW = uhWB(k,j) + uhWBpp(k,j);                               
-             ! ... Define scalar   at boundary face  
-             IF ( uW > 0.0 .AND. salbc > 0.0) THEN 
-               scW = salbc  
+             uW = uhWB(k,j) + uhWBpp(k,j);
+             ! ... Define scalar   at boundary face
+             IF ( uW > 0.0 .AND. salbc > 0.0) THEN
+               scW = salbc
              ELSE
                scW = tracerpp(k,l,itr)
              ENDIF
-             ! ... Include boundary flux in ex- array 
+             ! ... Include boundary flux in ex- array
              Bex(k,l) = Bex(k,l) +  uW * scW / twodx
            ENDDO
          ENDDO
 
        ! ..... North boundary ......
        CASE (2)
-         j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+         j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
            l = ij2l(i,j);
@@ -5476,22 +5476,22 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
            k1s = k1z(l)
            DO k = k1s,kms
              ! ... Define velocity at boundary face
-             vN = vhNB(k,i) + vhNBpp(k,i);                               
-             ! ... Define scalar   at boundary face  
-             IF ( vN < 0.0 .AND. salbc >= 0.0) THEN 
-               scN = salbc  
+             vN = vhNB(k,i) + vhNBpp(k,i);
+             ! ... Define scalar   at boundary face
+             IF ( vN < 0.0 .AND. salbc >= 0.0) THEN
+               scN = salbc
              ELSE
                scN = tracerpp(k,l,itr)
              ENDIF
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  vN * scN / twody 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  vN * scN / twody
            ENDDO
          ENDDO
 
        ! ..... East boundary ......
        CASE (3)
-         i  = isbcH(no,ide_t); 
-         js = jsbcH(no,ide_t); 
+         i  = isbcH(no,ide_t);
+         js = jsbcH(no,ide_t);
          je = jebcH(no,ide_t);
          DO j = js, je
            l = ij2l(i,j);
@@ -5499,22 +5499,22 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
            k1s = k1z(l)
            DO k = k1s,kms
              ! ... Define velocity at boundary face
-             uE = uhEB(k,j) + uhEBpp(k,j);                               
-             ! ... Define scalar   at boundary face  
-             IF ( uE < 0.0 .AND. salbc > 0.0) THEN 
-               scE = salbc  
+             uE = uhEB(k,j) + uhEBpp(k,j);
+             ! ... Define scalar   at boundary face
+             IF ( uE < 0.0 .AND. salbc > 0.0) THEN
+               scE = salbc
              ELSE
                scE = tracerpp(k,l,itr)
              ENDIF
-             ! ... Include boundary flux in ex 
-             Bex(k,l) = Bex(k,l) -  uE * scE / twodx 
+             ! ... Include boundary flux in ex
+             Bex(k,l) = Bex(k,l) -  uE * scE / twodx
            ENDDO
          ENDDO
 
        ! ..... South boundary ......
        CASE (4)
-         j  = jsbcH(no,ide_t); 
-         is = isbcH(no,ide_t); 
+         j  = jsbcH(no,ide_t);
+         is = isbcH(no,ide_t);
          ie = iebcH(no,ide_t);
          DO i = is, ie
            l = ij2l(i,j);
@@ -5522,14 +5522,14 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
            k1s = k1z(l)
            DO k = k1s,kms
              ! ... Define velocity at boundary face
-             vS = vhSB(k,i) + vhSBpp(k,i);                               
-             ! ... Define scalar   at boundary face  
-             IF ( vS > 0.0 .AND. salbc > 0.0) THEN 
-               scS = salbc  
+             vS = vhSB(k,i) + vhSBpp(k,i);
+             ! ... Define scalar   at boundary face
+             IF ( vS > 0.0 .AND. salbc > 0.0) THEN
+               scS = salbc
              ELSE
                scS = tracerpp(k,l,itr)
              ENDIF
-             ! ... Include boundary flux in ex 
+             ! ... Include boundary flux in ex
              Bex(k,l) = Bex(k,l) +  vS * scS / twody
            ENDDO
          ENDDO
@@ -5540,7 +5540,7 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
      CASE (3)
 
        !.....Get new boundary value of scalar.....
-       ! ... Set value of scalar at OpenBC nn - 
+       ! ... Set value of scalar at OpenBC nn -
        dthrs_sal = dtsecOpenBC/3600.
        salbc = parab(0.,thrs,varsOpenBC(no,2+itr,:),dthrs_sal)
 
@@ -5549,84 +5549,84 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
 
        ! ..... West boundary ......
        CASE (1)
-         i   = isbc(no); 
-         j   = jsbc(no); 
+         i   = isbc(no);
+         j   = jsbc(no);
          k1s = iebc(no);
          kms = jebc(no);
          l   = ij2l(i,j);
-         DO k = k1s,kms               
+         DO k = k1s,kms
            ! ... Define velocity at boundary face
-           uW = uhWB(k,j) + uhWBpp(k,j);                               
-           ! ... Define scalar   at boundary face  
-           IF ( uW > 0.0 .AND. salbc > 0.0) THEN 
-             scW = salbc  
+           uW = uhWB(k,j) + uhWBpp(k,j);
+           ! ... Define scalar   at boundary face
+           IF ( uW > 0.0 .AND. salbc > 0.0) THEN
+             scW = salbc
            ELSE
              scW = tracerpp(k,l,itr)
            ENDIF
-           ! ... Include boundary flux in ex- array 
-           Bex(k,l) = Bex(k,l) +  uW * scW / twodx 
+           ! ... Include boundary flux in ex- array
+           Bex(k,l) = Bex(k,l) +  uW * scW / twodx
          ENDDO
 
        ! ..... North boundary ......
        CASE (2)
-         j   = jsbc(no); 
-         i   = isbc(no); 
+         j   = jsbc(no);
+         i   = isbc(no);
          k1s = iebc(no);
          kms = jebc(no);
          l   = ij2l(i,j);
-         DO k = k1s,kms              
+         DO k = k1s,kms
            ! ... Define velocity at boundary face
-           vN = vhNB(k,i) + vhNBpp(k,i);                               
-           ! ... Define scalar   at boundary face  
-           IF ( vN < 0.0 .AND. salbc > 0.0) THEN 
-             scN = salbc  
+           vN = vhNB(k,i) + vhNBpp(k,i);
+           ! ... Define scalar   at boundary face
+           IF ( vN < 0.0 .AND. salbc > 0.0) THEN
+             scN = salbc
            ELSE
              scN = tracerpp(k,l,itr)
            ENDIF
-           ! ... Include boundary flux in ex 
-           Bex(k,l) = Bex(k,l) -  vN * scN / twody 
+           ! ... Include boundary flux in ex
+           Bex(k,l) = Bex(k,l) -  vN * scN / twody
          ENDDO
 
        ! ..... East boundary ......
        CASE (3)
-         i   = isbc(no); 
-         j   = jsbc(no); 
+         i   = isbc(no);
+         j   = jsbc(no);
          k1s = iebc(no);
          kms = jebc(no);
          l   = ij2l(i,j);
-         DO k = k1s,kms               
+         DO k = k1s,kms
            ! ... Define velocity at boundary face
-           uE = uhEB(k,j) + uhEBpp(k,j);                               
-           ! ... Define scalar   at boundary face  
-           IF ( uE < 0.0 .AND. salbc > 0.0) THEN 
-             scE = salbc  
+           uE = uhEB(k,j) + uhEBpp(k,j);
+           ! ... Define scalar   at boundary face
+           IF ( uE < 0.0 .AND. salbc > 0.0) THEN
+             scE = salbc
            ELSE
              scE = tracerpp(k,l,itr)
            ENDIF
-           ! ... Include boundary flux in ex 
-           Bex(k,l) = Bex(k,l) -  uE * scE / twodx 
+           ! ... Include boundary flux in ex
+           Bex(k,l) = Bex(k,l) -  uE * scE / twodx
          ENDDO
 
        ! ..... South boundary ......
        CASE (4)
-         i   = isbc(no); 
-         j   = jsbc(no); 
+         i   = isbc(no);
+         j   = jsbc(no);
          k1s = iebc(no);
          kms = jebc(no);
          l   = ij2l(i,j);
-         DO k = k1s, kms              
+         DO k = k1s, kms
            ! ... Define velocity at boundary face
-           vS = vhSB(k,i) + vhSBpp(k,i);                               
-           ! ... Define scalar   at boundary face  
-           IF ( vS > 0.0 .AND. salbc > 0.0) THEN 
-             scS = salbc  
+           vS = vhSB(k,i) + vhSBpp(k,i);
+           ! ... Define scalar   at boundary face
+           IF ( vS > 0.0 .AND. salbc > 0.0) THEN
+             scS = salbc
            ELSE
              scS = tracerpp(k,l,itr)
            ENDIF
-           ! ... Include boundary flux in ex 
-           Bex(k,l) = Bex(k,l) +  vS * scS / twody 
+           ! ... Include boundary flux in ex
+           Bex(k,l) = Bex(k,l) +  vS * scS / twody
          ENDDO
- 
+
        END SELECT
 
      ! ... Case 4 - Nested grid boundaries ...............................
@@ -5635,7 +5635,7 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
        ! ... Counter of nested grid boundaries
        niNGB = niNGB + 1;
 
-       ! ... Define weighting coefficients for records 
+       ! ... Define weighting coefficients for records
        !weight  = (thrs - thrsNGBp(no))/(thrsNGB(no)-thrsNGBp(no))
        weight  = 1.0
 !       print *,"TTniNGB:",niNGB,"thrs:",thrs,"thrsNGBp:",thrsNGBp
@@ -5647,78 +5647,78 @@ SUBROUTINE MODexTracer4openbc (itr,Bstart,Bend,Bex,thrs)
        CASE (1)
          i = isbcH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t);
          icl = 0
-         DO j = js, je; 
+         DO j = js, je;
            l   = ij2l(i,j)
            DO k = k1, kmz(l)
-           icl = icl + 1      
-           ! ... Define scalar at boundary face  
+           icl = icl + 1
+           ! ... Define scalar at boundary face
            scW = trNGB (icl,niNGB,itr)*    weight + &
                  trNGBp(icl,niNGB,itr)*(1.-weight)
            ! ... Define velocity at boundary face
-           uW  = uhWB(k,j) + uhWBpp(k,j); 
-           ! ... Re eefine scalar at boundary face if needed                               
+           uW  = uhWB(k,j) + uhWBpp(k,j);
+           ! ... Re eefine scalar at boundary face if needed
            IF ( uW <= 0.0 ) scW = tracerpp(k,l,itr)
-           ! ... Include boundary flux in ex- array 
+           ! ... Include boundary flux in ex- array
            Bex(k,l) = Bex(k,l) +  uW * scW / twodx
-         ENDDO; ENDDO 
+         ENDDO; ENDDO
 
        ! ..... East boundary ......
        CASE (3)
          i = isbcH(no,ide_t); js = jsbcH(no,ide_t); je = jebcH(no,ide_t);
          icl = 0
-         DO j = js, je; 
+         DO j = js, je;
            l   = ij2l(i,j)
            DO k = k1, kmz(l)
-           icl = icl + 1 
-           ! ... Define scalar at boundary face  
+           icl = icl + 1
+           ! ... Define scalar at boundary face
            scE = trNGB (icl,niNGB,itr)*    weight + &
                  trNGBp(icl,niNGB,itr)*(1.-weight)
            ! ... Define velocity at boundary face
-           uE  = uhEB(k,j) + uhEBpp(k,j);                               
-           ! ... Redefine scalar at boundary face if needed 
+           uE  = uhEB(k,j) + uhEBpp(k,j);
+           ! ... Redefine scalar at boundary face if needed
            IF ( uE >= 0.0 ) scE = tracerpp(k,l,itr)
-           ! ... Include boundary flux in ex 
-           Bex(k,l) = Bex(k,l) -  uE * scE / twodx       
+           ! ... Include boundary flux in ex
+           Bex(k,l) = Bex(k,l) -  uE * scE / twodx
          ENDDO; ENDDO
 
        ! ..... North boundary ......
        CASE (2)
          j = jsbcH(no,ide_t); is = isbcH(no,ide_t); ie = iebcH(no,ide_t);
            icl = siptNBI(no,ide_t) -1
-         DO i = is, ie; 
+         DO i = is, ie;
            l   = ij2l(i,j)
            DO k = k1, kmz(l)
-           icl = icl + 1      
-           ! ... Define scalar at boundary face  
+           icl = icl + 1
+           ! ... Define scalar at boundary face
            scN = trNGB (icl,niNGB,itr)*    weight + &
                  trNGBp(icl,niNGB,itr)*(1.-weight)
            ! ... Define velocity at boundary face
-           vN  = vhNB(k,i) + vhNBpp(k,i);                               
-           ! ... Redefine scalar at boundary face if needed  
+           vN  = vhNB(k,i) + vhNBpp(k,i);
+           ! ... Redefine scalar at boundary face if needed
            IF ( vN >= 0.0 ) scN = tracerpp(k,l,itr)
-           ! ... Include boundary flux in ex 
-           Bex(k,l) = Bex(k,l) -  vN * scN / twody 
+           ! ... Include boundary flux in ex
+           Bex(k,l) = Bex(k,l) -  vN * scN / twody
          ENDDO; ENDDO
 
        ! ..... South boundary ......
        CASE(4)
          j = jsbcH(no,ide_t); is = isbcH(no,ide_t); ie = iebcH(no,ide_t);
            icl = siptNBI(no,ide_t) -1
-         DO i = is, ie; 
+         DO i = is, ie;
            l   = ij2l(i,j)
            DO k = k1, kmz(l)
-           icl = icl + 1      
-           ! ... Define scalar at boundary face  
+           icl = icl + 1
+           ! ... Define scalar at boundary face
            scS = trNGB (icl,niNGB,itr)*    weight + &
                  trNGBp(icl,niNGB,itr)*(1.-weight)
            ! ... Define velocity at boundary face
-           vS  = vhSB(k,i) + vhSBpp(k,i);                               
-           ! ... Define scalar at boundary face if needed  
+           vS  = vhSB(k,i) + vhSBpp(k,i);
+           ! ... Define scalar at boundary face if needed
            IF ( vS <= 0.0 ) scS = tracerpp(k,l,itr)
-           ! ... Include boundary flux in ex 
+           ! ... Include boundary flux in ex
            Bex(k,l) = Bex(k,l) +  vS * scS / twody
          ENDDO; ENDDO
-       END SELECT      
+       END SELECT
 
      END SELECT
 
@@ -5732,9 +5732,9 @@ SUBROUTINE surfbc0
 !
 !  Purpose: This routine is called at the beginning of the program
 !           to open files with heat boundary condition data, to
-!           read the boundary condition time series data, to 
+!           read the boundary condition time series data, to
 !           assign heat_sources at time t=0. It uses
-!           the same scheme as used in openbc routines to read bc values. 
+!           the same scheme as used in openbc routines to read bc values.
 !
 !------------------------------------------------------------------------
 
@@ -5742,48 +5742,48 @@ SUBROUTINE surfbc0
    INTEGER :: ios, istat, nn, j, npsurfbc, nvsurfbc, imet
    CHARACTER(LEN=14) :: surfbcfmt, metxyfmt
 
-   
-   SELECT CASE (ifSurfBC) 
+
+   SELECT CASE (ifSurfBC)
 
    ! ... Surface boundary conditions set to constant values (no heat flux)
-   CASE (0) 
+   CASE (0)
 
      RETURN
 
    ! .... Surface boundary conditions read from files - PRE-PROCESS mode
    CASE (1)
 
-     !               ----- Open files with heatflux surface bc data-----   
+     !               ----- Open files with heatflux surface bc data-----
      OPEN (UNIT=i53, FILE='surfbc.txt', STATUS="OLD", IOSTAT=ios)
      IF (ios /= 0) CALL open_error ( "Error opening surfbc.txt", ios )
 
      !               -----Read files with heatflux surface bc data-----
-     ! Skip over first six header records in salinity boundary condition file 
+     ! Skip over first six header records in salinity boundary condition file
      READ (UNIT=i53, FMT='(/////)', IOSTAT=ios)
      IF (ios /= 0) CALL input_error ( ios, 101 )
-   
+
      ! Read number of points in file from seventh header record
      READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) npsurfbc
      IF (ios /= 0) CALL input_error ( ios, 102 )
-   
+
      ! Allocate space for the array of data
      ALLOCATE ( surfbc1(nvSurfbcP,npSurfbc), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 103 )
-   
+
      ! Write the format of the data records into an internal file
      WRITE (UNIT=surfbcfmt, FMT='("(10X,",I3,"G11.2)")') nvSurfbcP
-   
+
      ! Read data array and store it in memory
      DO j = 1, npSurfbc
        READ (UNIT=i53, FMT=surfbcfmt, IOSTAT=ios) &
             (surfbc1(nn,j), nn = 1, nvSurfbcP)
        IF (ios /= 0) CALL input_error ( ios, 104 )
      END DO
-   
+
      !           ----- Assign heat flux terms at time t=0.0-----
      eta = surfbc1(1,1)
      Qsw = surfbc1(2,1)
-     Qn  = surfbc1(3,1) 
+     Qn  = surfbc1(3,1)
 
      !           ----- Assign momentum flux terms at t=0.0 -----
      cdw = surfbc1(4,1)
@@ -5797,27 +5797,27 @@ SUBROUTINE surfbc0
    ! .... Surface boundary conditions RUN-TIME (I) mode
    CASE (2)
 
-     !               ----- Open files with heatflux surface bc data-----   
+     !               ----- Open files with heatflux surface bc data-----
      OPEN (UNIT=i53, FILE='surfbc.txt', STATUS="OLD", IOSTAT=ios)
      IF (ios /= 0) CALL open_error ( "Error opening surfbc.txt", ios )
 
      !               -----Read files with heatflux surface bc data-----
-     ! Skip over first six header records in salinity boundary condition file 
+     ! Skip over first six header records in salinity boundary condition file
      READ (UNIT=i53, FMT='(/////)', IOSTAT=ios)
      IF (ios /= 0) CALL input_error ( ios, 105 )
-   
+
      ! Read number of points in file from seventh header record
      READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) npSurfbc
      IF (ios /= 0) CALL input_error ( ios, 106 )
-     PRINT*, "*********** puntos surfbc.txt : ",npSurfbc 
-   
+     PRINT*, "*********** puntos surfbc.txt : ",npSurfbc
+
      ! Allocate space for the array of data
      ALLOCATE ( surfbc1(nvSurfbcR,npSurfbc), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 107 )
-   
+
      ! Write the format of the data records into an internal file
      WRITE (UNIT=surfbcfmt, FMT='("(10X,",I3,"G11.2)")') nvSurfbcR
-     
+
      ! Read data array and store it in memory
      DO j = 1, npSurfbc
        READ (UNIT=i53, FMT=surfbcfmt, IOSTAT=ios) &
@@ -5846,33 +5846,33 @@ SUBROUTINE surfbc0
    ! .... Surface boundary conditions RUN-TIME (II) mode
    CASE (3)
 
-     !               ----- Open files with heatflux surface bc data-----   
+     !               ----- Open files with heatflux surface bc data-----
      OPEN (UNIT=i53, FILE='surfbc.txt', STATUS="OLD", IOSTAT=ios)
      IF (ios /= 0) CALL open_error ( "Error opening surfbc.txt", ios )
 
      !               -----Read files with heatflux surface bc data-----
-     ! Skip over first six header records in salinity boundary condition file 
+     ! Skip over first six header records in salinity boundary condition file
      READ (UNIT=i53, FMT='(/////)', IOSTAT=ios)
      IF (ios /= 0) CALL input_error ( ios, 109 )
-   
+
      ! Read number of points in file from seventh header record
      READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) npSurfbc
      IF (ios /= 0) CALL input_error ( ios, 110 )
-   
+
      ! Allocate space for the array of data
      ALLOCATE ( surfbc1(nvSurfbcR,npSurfbc), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 111 )
-   
+
      ! Write the format of the data records into an internal file
      WRITE (UNIT=surfbcfmt, FMT='("(10X,",I3,"G11.2)")') nvSurfbcR
-   
+
      ! Read data array and store it in memory
      DO j = 1, npSurfbc
        READ (UNIT=i53, FMT=surfbcfmt, IOSTAT=ios) &
             (surfbc1(nn,j), nn = 1, nvSurfbcR)
        IF (ios /= 0) CALL input_error ( ios, 112 )
      END DO
-   
+
      !           ----- Assign heat flux terms at time t=0.0-----
      eta = surfbc1(1,1)        ! m-1
      Qsw = surfbc1(2,1)        ! W/m2
@@ -5900,13 +5900,13 @@ SUBROUTINE surfbc0
 
      ! Skip over first six header records in boundary condition file
      READ (UNIT=i53, FMT='(/////)', IOSTAT=ios)
-     IF (ios /= 0) CALL input_error ( ios, 113 )  
+     IF (ios /= 0) CALL input_error ( ios, 113 )
 
      ! Read number of met stations in file from seventh header record
      READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) nmetstat
      IF (ios /= 0) CALL input_error ( ios, 114 )
 
-     ! Allocate space for metxy matrix containing x,y locations 
+     ! Allocate space for metxy matrix containing x,y locations
      ! of all met stations & variables that store individual met records
      ! for a given time step for each of the variables
      ALLOCATE ( metxy (nmetstat*2), &
@@ -5915,7 +5915,7 @@ SUBROUTINE surfbc0
                 uair2D(nmetstat  ), vair2D(nmetstat), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 115 )
 
-     ! Allocate space for weightst matrix containing weighting coefficients 
+     ! Allocate space for weightst matrix containing weighting coefficients
      ! assigned to each of the met stations for each grid point
      ALLOCATE ( weightst(im1,jm1,nmetstat), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 116 )
@@ -5925,39 +5925,39 @@ SUBROUTINE surfbc0
 
      ! Read x,y position (in grid units) for each met station
      READ (UNIT=i53, FMT=metxyfmt, IOSTAT=ios)(metxy(nn), nn = 1, nmetstat*2)
-     
+
      IF (ios /= 0) CALL input_error ( ios, 117 )
- 
+
      ! ... Initialize Interpolation Schemes (weights for Barnes)
      CALL InitializeInterpolationMethods
 
      ! Read number of records in file from seventh header record
      READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) npSurfbc
      IF (ios /= 0) CALL input_error ( ios, 110 )
-   
+
      ! Allocate space for the array of data
-     nvSurfbc = 6 * nmetstat + 2 
+     nvSurfbc = 6 * nmetstat + 2
      ALLOCATE ( surfbc1(nvSurfbc,npSurfbc), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 111 )
-   
+
      ! Write the format of the data records into an internal file
      WRITE (UNIT=surfbcfmt, FMT='("(10X,",I3,"G11.2)")') nvSurfbc
-   
+
      ! Read data array and store it in memory
      DO j = 1, npSurfbc
          READ (UNIT=i53, FMT=surfbcfmt, IOSTAT=ios) &
 		      (surfbc1(nn,j), nn = 1, nvSurfbc)
          IF (ios /= 0) CALL input_error ( ios, 112 )
      END DO
- 
+
      !           ----- Assign surfBC at time t=0.0-----
      eta           = surfbc1(1             ,1)
      Pa            = surfbc1(2             ,1)
      DO imet = 1, nmetstat
        Qsw2D (imet)  = surfbc1((imet-1)*6 + 3,1)
-       Ta2D  (imet)  = surfbc1((imet-1)*6 + 4,1) 
-       RH2D  (imet)  = surfbc1((imet-1)*6 + 5,1) 
-       Cc2D  (imet)  = surfbc1((imet-1)*6 + 6,1) 
+       Ta2D  (imet)  = surfbc1((imet-1)*6 + 4,1)
+       RH2D  (imet)  = surfbc1((imet-1)*6 + 5,1)
+       Cc2D  (imet)  = surfbc1((imet-1)*6 + 6,1)
        uair2D(imet)  = surfbc1((imet-1)*6 + 7,1)
        vair2D(imet)  = surfbc1((imet-1)*6 + 8,1)
      ENDDO
@@ -5976,13 +5976,13 @@ SUBROUTINE surfbc0
 
      ! Skip over first six header records in boundary condition file
      READ (UNIT=i53, FMT='(/////)', IOSTAT=ios)
-     IF (ios /= 0) CALL input_error ( ios, 113 )  
+     IF (ios /= 0) CALL input_error ( ios, 113 )
 
      ! Read number of met stations in file from seventh header record
      READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) nmetstat
      IF (ios /= 0) CALL input_error ( ios, 114 )
 
-     ! Allocate space for metxy matrix containing x,y locations 
+     ! Allocate space for metxy matrix containing x,y locations
      ! of all met stations & variables that store individual met records
      ! for a given time step for each of the variables
      ALLOCATE ( metxy (nmetstat*2), weightn(nmetstat,nmetstat),          &  !new array created in types
@@ -5991,7 +5991,7 @@ SUBROUTINE surfbc0
                 uair2D(nmetstat  ), vair2D(nmetstat), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 115 )
 
-     ! Allocate space for weightst matrix containing weighting coefficients 
+     ! Allocate space for weightst matrix containing weighting coefficients
      ! assigned to each of the met stations for each grid point
      ALLOCATE ( weightst(im1,jm1,nmetstat), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 116 )
@@ -6007,7 +6007,7 @@ SUBROUTINE surfbc0
      do nn=1,nmetstat*2
            print *,"nmet",nn,": ",metxy(nn)
      end do
- 
+
      ! ... Initialize Interpolation Schemes (weights for Barnes)
      CALL InitializeInterpolationMethods
      !print *,"hola"
@@ -6016,7 +6016,7 @@ SUBROUTINE surfbc0
      IF (ios /= 0) CALL input_error ( ios, 110 )
      !print *,"hola2"
      ! Allocate space for the array of data
-     nvSurfbc = 6 * nmetstat + 2 
+     nvSurfbc = 6 * nmetstat + 2
      ALLOCATE ( surfbc1(nvSurfbc,npSurfbc), STAT=istat )
      IF (istat /= 0) CALL allocate_error ( istat, 111 )
      !print *,"hola3"
@@ -6035,9 +6035,9 @@ SUBROUTINE surfbc0
      Pa            = surfbc1(2             ,1)
      DO imet = 1, nmetstat
        Qsw2D (imet)  = surfbc1((imet-1)*6 + 3,1)
-       Ta2D  (imet)  = surfbc1((imet-1)*6 + 4,1) 
-       RH2D  (imet)  = surfbc1((imet-1)*6 + 5,1) 
-       Qlw2D (imet)  = surfbc1((imet-1)*6 + 6,1) 
+       Ta2D  (imet)  = surfbc1((imet-1)*6 + 4,1)
+       RH2D  (imet)  = surfbc1((imet-1)*6 + 5,1)
+       Qlw2D (imet)  = surfbc1((imet-1)*6 + 6,1)
        uair2D(imet)  = surfbc1((imet-1)*6 + 7,1)
        vair2D(imet)  = surfbc1((imet-1)*6 + 8,1)
      ENDDO
@@ -6047,8 +6047,45 @@ SUBROUTINE surfbc0
      !print *,"hola61"
      CALL DistributeMomentumHeatSources
      !print *,"hola7"
+
+   CASE (20)
+     !               ----- Open files with wind velocity bc data-----
+     OPEN (UNIT=i53, FILE='surfbcW.txt', STATUS="OLD", IOSTAT=ios)
+     IF (ios /= 0) CALL open_error ( "Error opening surfbc.txt", ios )
+
+     !               -----Read files with heatflux surface bc data-----
+     ! Skip over first six header records in salinity boundary condition file
+     READ (UNIT=i53, FMT='(/////)', IOSTAT=ios)
+     IF (ios /= 0) CALL input_error ( ios, 101 )
+
+     ! Read number of points in file from seventh header record
+     READ (UNIT=i53, FMT='(10X,I7)', IOSTAT=ios) npsurfbc
+     IF (ios /= 0) CALL input_error ( ios, 102 )
+
+     ! Allocate space for the array of data
+     ALLOCATE ( surfbc1(nvSurfbcW,npSurfbc), STAT=istat )
+     IF (istat /= 0) CALL allocate_error ( istat, 103 )
+
+     ! Write the format of the data records into an internal file
+     WRITE (UNIT=surfbcfmt, FMT='("(10X,",I3,"G11.2)")') nvSurfbcW
+
+     ! Read data array and store it in memory
+     DO j = 1, npSurfbc
+       READ (UNIT=i53, FMT=surfbcfmt, IOSTAT=ios) &
+            (surfbc1(nn,j), nn = 1, nvSurfbcW)
+       IF (ios /= 0) CALL input_error ( ios, 104 )
+     END DO
+
+     cdw = surfbc1(1,1)
+     uair= surfbc1(2,1)
+     vair= surfbc1(3,1)
+
+     ! ... Set heat sources for each cell
+     CALL DistributeQsw
+     CALL DistributeMomentumHeatSources
+
    END SELECT
-   
+
 END SUBROUTINE surfbc0
 
 !************************************************************************
@@ -6056,7 +6093,7 @@ SUBROUTINE surfbc(n,istep,thrs)
 !************************************************************************
 !
 !  Purpose: To define heat & momentum fluxes through the free surface
-!           at each time  
+!           at each time
 !
 !------------------------------------------------------------------------
 
@@ -6067,7 +6104,7 @@ SUBROUTINE surfbc(n,istep,thrs)
    REAL    :: dthrs_surfbc
    INTEGER :: i, j, k, ios, nn, is, ie, js, je, kb, isalin, itest, imet,liter,l
 
-   SELECT CASE (ifSurfBC) 
+   SELECT CASE (ifSurfBC)
 
    !               ----- No surface bc data----------------
    CASE (0)
@@ -6082,8 +6119,8 @@ SUBROUTINE surfbc(n,istep,thrs)
       END DO
 
    !               ----- Use surface bc data from file ----
-   CASE(1) ! Heat budget on preprocess mode - shortwave radiative and 
-           ! net heat fluxes (including longwave & sensible & latent) as input 
+   CASE(1) ! Heat budget on preprocess mode - shortwave radiative and
+           ! net heat fluxes (including longwave & sensible & latent) as input
            ! Space uniform & time varying
 
      !.....Return from subroutine on trapezoidal steps (except if n=1).....
@@ -6093,18 +6130,18 @@ SUBROUTINE surfbc(n,istep,thrs)
      dthrs_surfbc = dtSurfbc/3600.
      eta = parab(0.,thrs,surfbc1(1,:),dthrs_surfbc)
      Qsw = parab(0.,thrs,surfbc1(2,:),dthrs_surfbc)
-     Qn  = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc) 
+     Qn  = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc)
      cdw = parab(0.,thrs,surfbc1(4,:),dthrs_surfbc)
      uair= parab(0.,thrs,surfbc1(5,:),dthrs_surfbc)
-     vair= parab(0.,thrs,surfbc1(6,:),dthrs_surfbc) 
+     vair= parab(0.,thrs,surfbc1(6,:),dthrs_surfbc)
 
-     ! ... Calculate 3D-spatially variable sources 
+     ! ... Calculate 3D-spatially variable sources
      CALL DistributeQswH
      CALL DistributeMomentumHeatSourcesH(n,istep)
 
-   CASE (2) ! Heat budget on run-time mode (I) - shortwave fluxes as input; 
+   CASE (2) ! Heat budget on run-time mode (I) - shortwave fluxes as input;
             ! longwave & latent & sensible heat fluxes calculated.
-            ! space uniform & time varying 
+            ! space uniform & time varying
 
      !.....Return from subroutine on trapezoidal steps (except if n=1).....
      IF (n > 1) THEN; IF (istep == 2) RETURN; END IF
@@ -6113,21 +6150,21 @@ SUBROUTINE surfbc(n,istep,thrs)
      dthrs_surfbc = dtSurfbc/3600.
      eta = parab(0.,thrs,surfbc1(1,:),dthrs_surfbc)
      Qsw = parab(0.,thrs,surfbc1(2,:),dthrs_surfbc)
-     Ta  = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc)  
+     Ta  = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc)
      Pa  = parab(0.,thrs,surfbc1(4,:),dthrs_surfbc)
      Rh  = parab(0.,thrs,surfbc1(5,:),dthrs_surfbc)
-     Cc  = parab(0.,thrs,surfbc1(6,:),dthrs_surfbc) 
+     Cc  = parab(0.,thrs,surfbc1(6,:),dthrs_surfbc)
      cdw = parab(0.,thrs,surfbc1(7,:),dthrs_surfbc)
      uair= parab(0.,thrs,surfbc1(8,:),dthrs_surfbc)
-     vair= parab(0.,thrs,surfbc1(9,:),dthrs_surfbc) 
+     vair= parab(0.,thrs,surfbc1(9,:),dthrs_surfbc)
 
      ! ... Calculate 3D-spatially variable heat sources
      CALL DistributeQswH
      CALL DistributeMomentumHeatSourcesH(n,istep)
 
    CASE (3) ! Heat budget on run-time mode (II) - radiative (short & longwave)
-            ! fluxes as input; latent & sensible heat fluxes calculated. 
-            ! Space uniform & time varying 
+            ! fluxes as input; latent & sensible heat fluxes calculated.
+            ! Space uniform & time varying
 
      !.....Return from subroutine on trapezoidal steps (except if n=1).....
      IF (n > 1) THEN; IF (istep == 2) RETURN; END IF
@@ -6136,13 +6173,13 @@ SUBROUTINE surfbc(n,istep,thrs)
      dthrs_surfbc = dtSurfbc/3600.
      eta = parab(0.,thrs,surfbc1(1,:),dthrs_surfbc)
      Qsw = parab(0.,thrs,surfbc1(2,:),dthrs_surfbc)
-     Ta  = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc)  
+     Ta  = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc)
      Pa  = parab(0.,thrs,surfbc1(4,:),dthrs_surfbc)
      Rh  = parab(0.,thrs,surfbc1(5,:),dthrs_surfbc)
-     Qlw = parab(0.,thrs,surfbc1(6,:),dthrs_surfbc) 
+     Qlw = parab(0.,thrs,surfbc1(6,:),dthrs_surfbc)
      cdw = parab(0.,thrs,surfbc1(7,:),dthrs_surfbc)
      uair= parab(0.,thrs,surfbc1(8,:),dthrs_surfbc)
-     vair= parab(0.,thrs,surfbc1(9,:),dthrs_surfbc) 
+     vair= parab(0.,thrs,surfbc1(9,:),dthrs_surfbc)
 
      ! ... Calculate 3D-spatially variable heat sources
      CALL DistributeQswH
@@ -6153,18 +6190,18 @@ SUBROUTINE surfbc(n,istep,thrs)
 
      !.....Return from subroutine on trapezoidal steps (except if n=1).....
      IF (n > 1) THEN; IF (istep == 2) RETURN; END IF
-     
+
      !.....Interpolate heat & momentum flux vars. values to present time step .....
      DO imet = 1, nmetstat
        dthrs_surfbc  = dtSurfbc/3600.
        eta           = parab(0.,thrs,surfbc1(1,:),dthrs_surfbc)
        Pa            = parab(0.,thrs,surfbc1(2,:),dthrs_surfbc)
        Qsw2D (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 3,:),dthrs_surfbc)
-       Ta2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 4,:),dthrs_surfbc) 
-       RH2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 5,:),dthrs_surfbc) 
-       Cc2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 6,:),dthrs_surfbc) 
+       Ta2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 4,:),dthrs_surfbc)
+       RH2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 5,:),dthrs_surfbc)
+       Cc2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 6,:),dthrs_surfbc)
        uair2D(imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 7,:),dthrs_surfbc)
-       vair2D(imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 8,:),dthrs_surfbc) 
+       vair2D(imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 8,:),dthrs_surfbc)
      ENDDO
 
      ! ... Distribute heat and momentum sources entering through free surface
@@ -6177,21 +6214,34 @@ SUBROUTINE surfbc(n,istep,thrs)
 
      !.....Return from subroutine on trapezoidal steps (except if n=1).....
      IF (n > 1) THEN; IF (istep == 2) RETURN; END IF
-     
+
      !.....Interpolate heat & momentum flux vars. values to present time step .....
      DO imet = 1, nmetstat
        dthrs_surfbc  = dtSurfbc/3600.
        eta           = parab(0.,thrs,surfbc1(1,:),dthrs_surfbc)
        Pa            = parab(0.,thrs,surfbc1(2,:),dthrs_surfbc)
        Qsw2D (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 3,:),dthrs_surfbc)
-       Ta2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 4,:),dthrs_surfbc) 
-       RH2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 5,:),dthrs_surfbc) 
-       Qlw2D (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 6,:),dthrs_surfbc) 
+       Ta2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 4,:),dthrs_surfbc)
+       RH2D  (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 5,:),dthrs_surfbc)
+       Qlw2D (imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 6,:),dthrs_surfbc)
        uair2D(imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 7,:),dthrs_surfbc)
-       vair2D(imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 8,:),dthrs_surfbc) 
+       vair2D(imet)  = parab(0.,thrs,surfbc1((imet-1)*6 + 8,:),dthrs_surfbc)
      ENDDO
 
      ! ... Distribute heat and momentum sources entering through free surface
+     CALL DistributeQswH
+     CALL DistributeMomentumHeatSourcesH(n,istep)
+
+   CASE (20)
+     !.....Return from subroutine on trapezoidal steps (except if n=1).....
+     IF (n > 1) THEN; IF (istep == 2) RETURN; END IF
+     !.....Interpolate heat & momentum flux vars. to time n .....
+     dthrs_surfbc = dtSurfbc/3600.
+     cdw = parab(0.,thrs,surfbc1(1,:),dthrs_surfbc)
+     uair = parab(0.,thrs,surfbc1(2,:),dthrs_surfbc)
+     vair = parab(0.,thrs,surfbc1(3,:),dthrs_surfbc)
+
+     ! ... Calculate 3D-spatially variable sources
      CALL DistributeQswH
      CALL DistributeMomentumHeatSourcesH(n,istep)
 
@@ -6203,7 +6253,7 @@ END SUBROUTINE surfbc
  SUBROUTINE DistributeQswH
 !************************************************************************
 !
-!  Purpose: To apportion the solar irradiance penetrating the 
+!  Purpose: To apportion the solar irradiance penetrating the
 !           lake through the surface among the layers in each
 !           water column
 !
@@ -6225,7 +6275,7 @@ END SUBROUTINE surfbc
 
        ! ... Define top & bottom wet layers.....
        kms = kmz(l);
-       k1s = k1z(l);    
+       k1s = k1z(l);
        nwlayers = (kms-k1s) + 1
 
        SELECT CASE (nwlayers)
@@ -6236,17 +6286,17 @@ END SUBROUTINE surfbc
 
        CASE (2:)
 
-         ! ... Compute the array of vertical distances from the 
+         ! ... Compute the array of vertical distances from the
          !     free surface to the top of each layer
          zfromt(k1s) = 0.0
-         DO k = k1s+1, kms+1          
+         DO k = k1s+1, kms+1
            zfromt(k)    = zfromt(k-1) + hp(k-1,l)
            QswFr(k-1,l) = SolarFr(zfromt(k-1)) - SolarFr(zfromt(k))
          END DO
-         ! ... Redistribute Qsw not absorbed once it reaches the bottom 
+         ! ... Redistribute Qsw not absorbed once it reaches the bottom
          !     Probably it is not needed in deep lakes but could account for
-         !     overheating for shallower lakes. 
-         remFr = 1. - SUM ( QswFr (k1s:kms,l) ) 
+         !     overheating for shallower lakes.
+         remFr = 1. - SUM ( QswFr (k1s:kms,l) )
          IF ( remFr > 1.e-6 ) THEN
            QswFr (k1s:kms,l) = QswFr (k1s:kms,l) + remFr / nwlayers
          END IF
@@ -6261,7 +6311,7 @@ END SUBROUTINE DistributeQswH
  SUBROUTINE DistributeQsw
 !************************************************************************
 !
-!  Purpose: To apportion the solar irradiance penetrating the 
+!  Purpose: To apportion the solar irradiance penetrating the
 !           lake through the surface among the layers in each
 !           water column
 !
@@ -6281,7 +6331,7 @@ END SUBROUTINE DistributeQswH
 
        ! ... Define top & bottom wet layers.....
        kms = kmz(l);
-       k1s = k1z(l);    
+       k1s = k1z(l);
        nwlayers = (kms-k1s) + 1
 
        SELECT CASE (nwlayers)
@@ -6292,17 +6342,17 @@ END SUBROUTINE DistributeQswH
 
        CASE (2:)
 
-         ! ... Compute the array of vertical distances from the 
+         ! ... Compute the array of vertical distances from the
          !     free surface to the top of each layer
          zfromt(k1s) = 0.0
-         DO k = k1s+1, kms+1          
+         DO k = k1s+1, kms+1
            zfromt(k)    = zfromt(k-1) + hp(k-1,l)
            QswFr(k-1,l) = SolarFr(zfromt(k-1)) - SolarFr(zfromt(k))
          END DO
-         ! ... Redistribute Qsw not absorbed once it reaches the bottom 
+         ! ... Redistribute Qsw not absorbed once it reaches the bottom
          !     Probably it is not needed in deep lakes but could account for
-         !     overheating for shallower lakes. 
-         remFr = 1. - SUM ( QswFr (k1s:kms,l) ) 
+         !     overheating for shallower lakes.
+         remFr = 1. - SUM ( QswFr (k1s:kms,l) )
          IF ( remFr > 1.e-6 ) THEN
            QswFr (k1s:kms,l) = QswFr (k1s:kms,l) + remFr / nwlayers
          END IF
@@ -6314,13 +6364,13 @@ END SUBROUTINE DistributeQswH
 END SUBROUTINE DistributeQsw
 
 !************************************************************************
-REAL FUNCTION SolarFr ( depth ) 
+REAL FUNCTION SolarFr ( depth )
 !************************************************************************
 !
-!  Purpose: To calculate the attenuation of solar irradiance penetrating  
+!  Purpose: To calculate the attenuation of solar irradiance penetrating
 !           the water column through the free surface. It uses formulation
-!           proposed in Henderson-Sellers' Engineering Limnology Eq. 2.25 
-!           According to the authors this equation is only valid for 
+!           proposed in Henderson-Sellers' Engineering Limnology Eq. 2.25
+!           According to the authors this equation is only valid for
 !           eta (attenuation coefficient) larger than 0.1
 !
 !------------------------------------------------------------------------
@@ -6331,14 +6381,14 @@ REAL FUNCTION SolarFr ( depth )
   ! ... Local variables
   REAL            :: BetaSol, z
   REAL, PARAMETER :: zA = 0.60
-  
+
   z = depth
   IF ( eta .GE. 0.1) THEN
-    BetaSol = 0.265*LOG (eta)+0.614; 
+    BetaSol = 0.265*LOG (eta)+0.614;
     IF ( z<zA ) THEN
       SolarFr = (1.-BetaSol*z/zA)
     ELSE
-      SolarFr = (1.-BetaSol)*EXP(-eta*(z-zA)); 
+      SolarFr = (1.-BetaSol)*EXP(-eta*(z-zA));
     ENDIF
   ELSE
     SolarFr = EXP(-eta*z)
@@ -6350,8 +6400,8 @@ END FUNCTION SolarFr
  SUBROUTINE DistributeMomentumHeatSources
 !************************************************************************
 !
-!  Purpose: To construct a 2D met field from discrete variables & 
-!           to contruct heat sources for each computational cell 
+!  Purpose: To construct a 2D met field from discrete variables &
+!           to contruct heat sources for each computational cell
 !
 !------------------------------------------------------------------------
 
@@ -6362,11 +6412,11 @@ END FUNCTION SolarFr
   REAL, DIMENSION(nmetstat) :: Qswresid,Taresid,RHresid,Qlwresid,uresid,vresid
 
   ! ... Local arrays containing parameters
-  INTEGER, DIMENSION (6) :: range 
+  INTEGER, DIMENSION (6) :: range
   REAL,    DIMENSION (5) :: a_d, b_d, p_d
   REAL,    DIMENSION (5) :: a_h, b_h, p_h, c_h
   REAL,    DIMENSION (5) :: a_e, b_e, p_e, c_e
-  
+
   ! .... Parameter definition
   REAL, PARAMETER :: EmWater = 0.97
   REAL, PARAMETER :: StephanBoltzman = 5.6697e-8
@@ -6398,21 +6448,21 @@ END FUNCTION SolarFr
   CASE (1) ! Heat budget on PRE-PROCESS mode - spatially uniform conditions
 
     DO l = 1,lm ;
- 
+
       ! ... Map 2D-l into 3D(i,j) indexes ........................
       i = l2i(l); j = l2j(l);
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface layer ......
       HeatSource(k1s,l)=HeatSource(k1s,l)+ (Qn-Qsw)
- 
-      ! ... Add penetrative components to water column & 
+
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) + & 
+        HeatSource(k,l) = (HeatSource(k,l) + &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
        IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6423,21 +6473,21 @@ END FUNCTION SolarFr
 
     ! ... Define variables used in cals. and equal to all surface cells
     ea    = saturated_vapor_pressure (Ta+273.) * Rh
-    EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714 		
-    EmAir = EmAir * ( 1. + 0.17 * Cc**2. ) 
-    Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4. 
-    Qbra  = Qbri * ( 1. - Al ) 
+    EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714
+    EmAir = EmAir * ( 1. + 0.17 * Cc**2. )
+    Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4.
+    Qbra  = Qbri * ( 1. - Al )
 
-    ! ... Loop over surface cells 
+    ! ... Loop over surface cells
     DO l = 1, lm;
 
       ! ... Map 2D-l into 3D(i,j) indexes ........................
       i = l2i(l); j = l2j(l);
 
-      ! ... Define bulk aerodynamic coefficients for neutral conditions 
+      ! ... Define bulk aerodynamic coefficients for neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ws = SQRT(uair(l)**2. + vair(l)**2.)    
+      ws = SQRT(uair(l)**2. + vair(l)**2.)
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6447,24 +6497,24 @@ END FUNCTION SolarFr
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation 
+      ! a. Long wave radiation
       HeatSource(k1s,l)  = Qbra - EmWater * StephanBoltzman *    &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6476,16 +6526,16 @@ END FUNCTION SolarFr
     ! ... Define variables used in cals. and equal to all surface cells
     ea    = saturated_vapor_pressure (Ta+273.) * Rh
 
-    ! ... Loop over surface cells 
+    ! ... Loop over surface cells
     DO l = 1, lm;
 
       ! ... Map 2D-l into 3D(i,j) indexes ........................
       i = l2i(l); j = l2j(l);
 
-      ! ... Define bulk aerodynamic coefficients for neutral conditions 
+      ! ... Define bulk aerodynamic coefficients for neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ws = SQRT(uair(l)**2. + vair(l)**2.)    
+      ws = SQRT(uair(l)**2. + vair(l)**2.)
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6495,25 +6545,25 @@ END FUNCTION SolarFr
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation (incoming LW as measured) 
+      ! a. Long wave radiation (incoming LW as measured)
       HeatSource(k1s,l)  = Qlw * (1.- Al) -                      &
                            EmWater * StephanBoltzman *           &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6525,7 +6575,7 @@ END FUNCTION SolarFr
     ! Calculate residuals from first Barnes pass at met station points (added 12/2010 SWA)
     CALL CalculateMetResiduals (Qswresid,Taresid,RHresid,Qlwresid,uresid,vresid)
 
-    ! ... Loop over surface cells 
+    ! ... Loop over surface cells
     DO l = 1, lm;
 
       ! ... Map 2D-l into 3D(i,j) indexes ........................
@@ -6537,8 +6587,8 @@ END FUNCTION SolarFr
 
       ! ... Wind speed over the water column
       ws  = SQRT (uair(l)**2.+vair(l)**2.);
-        
-      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions 
+
+      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
       ! ... Define range of wind speed
@@ -6550,41 +6600,41 @@ END FUNCTION SolarFr
       coeffH = (a_h(irg)+b_h(irg)*ws**p_h(irg)+c_h(irg)*(ws-8.)**2.)*1.e-3
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
-      ! ... Calculate drag coefficient (Amorocho & DeVries)  
-      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104      
+      ! ... Calculate drag coefficient (Amorocho & DeVries)
+      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104
 
       ! ... Define variables used in cals. and equal to all surface cells
       ea    = saturated_vapor_pressure (Ta+273.) * Rh
-      EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714 		
-      EmAir = EmAir * ( 1. + 0.17 * Cc**2. ) 
-      Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4. 
+      EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714
+      EmAir = EmAir * ( 1. + 0.17 * Cc**2. )
+      Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4.
       Qbra  = Qbri * ( 1. - Al )
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation 
+      ! a. Long wave radiation
       HeatSource(k1s,l)  = Qbra - EmWater * StephanBoltzman *    &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
 
     ENDDO
-  
+
   CASE (11) ! Interpolation
     !print *,"hello1"
     ! Calculate residuals from first Barnes pass at met station points (added 12/2010 SWA)
@@ -6600,13 +6650,13 @@ END FUNCTION SolarFr
       CALL InterpMetData (i,j,Qswresid,Taresid,RHresid,Qlwresid,uresid,vresid, &
                         & Qsw,Ta,RH,Qlw,uair(l),vair(l))
 
-      ! ... Wind speed over the water column  
+      ! ... Wind speed over the water column
       ws  = SQRT (uair(l)**2.+vair(l)**2.);
 
-      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions 
+      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ! ... Define range of wind speed 
+      ! ... Define range of wind speed
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6615,32 +6665,32 @@ END FUNCTION SolarFr
       coeffH = (a_h(irg)+b_h(irg)*ws**p_h(irg)+c_h(irg)*(ws-8.)**2.)*1.e-3
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
-      ! ... Calculate drag coefficient (Amorocho & DeVries)  
-      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104      
+      ! ... Calculate drag coefficient (Amorocho & DeVries)
+      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104
 
       ! ... Define variables used in cals. and equal to all surface cells
-      Qbra  = Qlw * ( 1. - Al ) 
+      Qbra  = Qlw * ( 1. - Al )
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       ea  = saturated_vapor_pressure(Ta         +273.) * Rh
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation 
+      ! a. Long wave radiation
       HeatSource(k1s,l)  = Qbra - EmWater * StephanBoltzman *    &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6655,8 +6705,8 @@ END SUBROUTINE DistributeMomentumHeatSources
  SUBROUTINE DistributeMomentumHeatSourcesH(n,istep)
 !************************************************************************
 !
-!  Purpose: To construct a 2D met field from discrete variables & 
-!           to contruct heat sources for each computational cell 
+!  Purpose: To construct a 2D met field from discrete variables &
+!           to contruct heat sources for each computational cell
 !
 !------------------------------------------------------------------------
 
@@ -6669,11 +6719,11 @@ END SUBROUTINE DistributeMomentumHeatSources
   REAL, DIMENSION(nmetstat) :: Qswresid,Taresid,RHresid,Qlwresid,uresid,vresid
 
   ! ... Local arrays containing parameters
-  INTEGER, DIMENSION (6) :: range 
+  INTEGER, DIMENSION (6) :: range
   REAL,    DIMENSION (5) :: a_d, b_d, p_d
   REAL,    DIMENSION (5) :: a_h, b_h, p_h, c_h
   REAL,    DIMENSION (5) :: a_e, b_e, p_e, c_e
-  
+
   ! .... Parameter definition
   REAL, PARAMETER :: EmWater = 0.97
   REAL, PARAMETER :: StephanBoltzman = 5.6697e-8
@@ -6713,21 +6763,21 @@ END DO
     DO liter = lhi(omp_get_thread_num ( )+1), lhf(omp_get_thread_num ( )+1)
 
        l = id_column(liter)
- 
+
       ! ... Map 2D-l into 3D(i,j) indexes ........................
       i = l2i(l); j = l2j(l);
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface layer ......
       HeatSource(k1s,l)=HeatSource(k1s,l)+ (Qn-Qsw)
- 
-      ! ... Add penetrative components to water column & 
+
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) + & 
+        HeatSource(k,l) = (HeatSource(k,l) + &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
        IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6738,12 +6788,12 @@ END DO
 
     ! ... Define variables used in cals. and equal to all surface cells
     ea    = saturated_vapor_pressure (Ta+273.) * Rh
-    EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714 		
-    EmAir = EmAir * ( 1. + 0.17 * Cc**2. ) 
-    Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4. 
-    Qbra  = Qbri * ( 1. - Al ) 
+    EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714
+    EmAir = EmAir * ( 1. + 0.17 * Cc**2. )
+    Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4.
+    Qbra  = Qbri * ( 1. - Al )
 
-    ! ... Loop over surface cells 
+    ! ... Loop over surface cells
     DO liter = lhi(omp_get_thread_num ( )+1), lhf(omp_get_thread_num ( )+1)
 
        l = id_column(liter)
@@ -6751,10 +6801,10 @@ END DO
       ! ... Map 2D-l into 3D(i,j) indexes ........................
       i = l2i(l); j = l2j(l);
 
-      ! ... Define bulk aerodynamic coefficients for neutral conditions 
+      ! ... Define bulk aerodynamic coefficients for neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ws = SQRT(uair(l)**2. + vair(l)**2.)    
+      ws = SQRT(uair(l)**2. + vair(l)**2.)
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6764,24 +6814,24 @@ END DO
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation 
+      ! a. Long wave radiation
       HeatSource(k1s,l)  = Qbra - EmWater * StephanBoltzman *    &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6793,7 +6843,7 @@ END DO
     ! ... Define variables used in cals. and equal to all surface cells
     ea    = saturated_vapor_pressure (Ta+273.) * Rh
 
-    ! ... Loop over surface cells 
+    ! ... Loop over surface cells
     DO liter = lhi(omp_get_thread_num ( )+1), lhf(omp_get_thread_num ( )+1)
 
        l = id_column(liter)
@@ -6801,10 +6851,10 @@ END DO
       ! ... Map 2D-l into 3D(i,j) indexes ........................
       i = l2i(l); j = l2j(l);
 
-      ! ... Define bulk aerodynamic coefficients for neutral conditions 
+      ! ... Define bulk aerodynamic coefficients for neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ws = SQRT(uair(l)**2. + vair(l)**2.)    
+      ws = SQRT(uair(l)**2. + vair(l)**2.)
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6814,25 +6864,25 @@ END DO
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation (incoming LW as measured) 
+      ! a. Long wave radiation (incoming LW as measured)
       HeatSource(k1s,l)  = Qlw * (1.- Al) -                      &
                            EmWater * StephanBoltzman *           &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
@@ -6840,11 +6890,11 @@ END DO
     ENDDO
 
   CASE (10) ! Interpolation
-  
+
     ! Calculate residuals from first Barnes pass at met station points (added 12/2010 SWA)
     CALL CalculateMetResiduals (Qswresid,Taresid,RHresid,Qlwresid,uresid,vresid)
 
-    ! ... Loop over surface cells 
+    ! ... Loop over surface cells
     DO liter = lhi(omp_get_thread_num ( )+1), lhf(omp_get_thread_num ( )+1)
 
       l = id_column(liter)
@@ -6858,11 +6908,11 @@ END DO
 
       ! ... Wind speed over the water column
       ws  = SQRT (uair(l)**2.+vair(l)**2.);
-        
-      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions 
+
+      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ! ... Define range of wind speed 
+      ! ... Define range of wind speed
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6871,44 +6921,44 @@ END DO
       coeffH = (a_h(irg)+b_h(irg)*ws**p_h(irg)+c_h(irg)*(ws-8.)**2.)*1.e-3
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
-      ! ... Calculate drag coefficient (Amorocho & DeVries)  
-      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104      
+      ! ... Calculate drag coefficient (Amorocho & DeVries)
+      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104
 
       ! ... Define variables used in cals. and equal to all surface cells
       ea    = saturated_vapor_pressure (Ta+273.) * Rh
-      EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714 		
-      EmAir = EmAir * ( 1. + 0.17 * Cc**2. ) 
-      Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4. 
-      Qbra  = Qbri * ( 1. - Al ) 
+      EmAir = 0.642 * ( ea / (Ta+273.) )**0.14285714
+      EmAir = EmAir * ( 1. + 0.17 * Cc**2. )
+      Qbri  = EmAir * StephanBoltzman * (Ta+273.) ** 4.
+      Qbra  = Qbri * ( 1. - Al )
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation 
+      ! a. Long wave radiation
       HeatSource(k1s,l)  = Qbra - EmWater * StephanBoltzman *    &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
 
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
 
     ENDDO
-  
+
   CASE (11) ! Interpolation
-  
+
     ! Calculate residuals from first Barnes pass at met station points (added 12/2010 SWA)
     CALL CalculateMetResiduals (Qswresid,Taresid,RHresid,Qlwresid,uresid,vresid)
 
@@ -6927,10 +6977,10 @@ END DO
       ! ... Wind speed over the water column
       ws  = SQRT (uair(l)**2.+vair(l)**2.);
 
-      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions 
+      ! ... Define bulk aerodynamic coefficients for heat transfer under neutral conditions
       !     based on Kondo, 1975. Air-sea bulk transfer coefficients in diabatic
       !     conditions. In Boundary-Layer Meteorology 9 (1975) 91-112
-      ! ... Define range of wind speed 
+      ! ... Define range of wind speed
       IF      (ws>range(1).AND.ws<=range(2)) THEN; irg = 1
       ELSE IF (ws>range(2).AND.ws<=range(3)) THEN; irg = 2
       ELSE IF (ws>range(3).AND.ws<=range(4)) THEN; irg = 3
@@ -6939,38 +6989,38 @@ END DO
       coeffH = (a_h(irg)+b_h(irg)*ws**p_h(irg)+c_h(irg)*(ws-8.)**2.)*1.e-3
       coeffE = (a_e(irg)+b_e(irg)*ws**p_e(irg)+c_e(irg)*(ws-8.)**2.)*1.e-3
 
-      ! ... Calculate drag coefficient (Amorocho & DeVries)  
-      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104      
+      ! ... Calculate drag coefficient (Amorocho & DeVries)
+      cdw(l) = 0.0015 * 1./(1.0+ EXP((12.5-ws)/1.56))+0.00104
 
       ! ... Define variables used in cals. and equal to all surface cells
-      Qbra  = Qlw * ( 1. - Al ) 
+      Qbra  = Qlw * ( 1. - Al )
 
       ! ... Define top & bottom wet layers........................
-      k1s = k1z(l);    
+      k1s = k1z(l);
       kms = kmz(l);
 
       ! ... Add non-penetrative components to surface cells
       ea  = saturated_vapor_pressure(Ta         +273.) * Rh
       esw = saturated_vapor_pressure(salp(k1s,l)+273.)
       Lv  = latent_heat_vaporization(salp(k1s,l)+273.)
-      ! a. Long wave radiation 
+      ! a. Long wave radiation
       HeatSource(k1s,l)  = Qbra - EmWater * StephanBoltzman *    &
                            (salp(k1s,l)+273.) ** 4.
       ! b. Latent & Sensible heat fluxes
       HeatSource(k1s,l) = HeatSource(k1s,l) -                    &
-      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - & 
+      & rhoair*             Lv * coeffE*(esw-ea)*0.622/Pa * ws - &
       & rhoair*SpecificHeatAir * coeffH*(salp(k1s,l)-Ta ) * ws
 
-      ! ... Add penetrative components to water column & 
+      ! ... Add penetrative components to water column &
       !     express heat sources in temperature units ............
       DO k = k1s, kms
-        HeatSource(k,l) = (HeatSource(k,l) +                     & 
+        HeatSource(k,l) = (HeatSource(k,l) +                     &
           Qsw*QswFr(k,l))/((rhop(k,l)+1000.)*Cp)
         IF (Qsw<-100.) THEN; HeatSource(k,l) = 0.0E0; ENDIF
       END DO
 
     ENDDO
-  
+
   END SELECT
 
 END SUBROUTINE DistributeMomentumHeatSourcesH
@@ -6982,9 +7032,9 @@ REAL FUNCTION saturated_vapor_pressure (T)
   IMPLICIT NONE
   REAL, INTENT (IN) :: T
 
-  saturated_vapor_pressure = 2.1718e10 * EXP( -4157. / (T - 33.91) ) 
+  saturated_vapor_pressure = 2.1718e10 * EXP( -4157. / (T - 33.91) )
 
-  END FUNCTION saturated_vapor_pressure 
+  END FUNCTION saturated_vapor_pressure
 
 !************************************************************************
 REAL FUNCTION latent_heat_vaporization (T)
@@ -6993,7 +7043,7 @@ REAL FUNCTION latent_heat_vaporization (T)
   IMPLICIT NONE
   REAL, INTENT (IN) :: T
 
-  latent_heat_vaporization = 1.91846e6 * ( T / (T - 33.91) ) ** 2. 
+  latent_heat_vaporization = 1.91846e6 * ( T / (T - 33.91) ) ** 2.
 
   END FUNCTION latent_heat_vaporization
 
@@ -7019,7 +7069,7 @@ SUBROUTINE InitializeInterpolationMethods
       ! Find average distance from grip point to all met stations
       da = 0.0
       DO imet = 1, nmetstat
-        xi = metxy((imet-1)*2+1) - FLOAT(i);  
+        xi = metxy((imet-1)*2+1) - FLOAT(i);
         yi = metxy((imet-1)*2+2) - FLOAT(j);
         di = SQRT(xi**2.+yi**2.)
         da = da + di
@@ -7029,14 +7079,14 @@ SUBROUTINE InitializeInterpolationMethods
       ! Estimate weight based on distance to met station imet & da
       sumw = 0.0E0
       DO imet = 1, nmetstat
-        xi = metxy((imet-1)*2+1) - FLOAT(i);  
+        xi = metxy((imet-1)*2+1) - FLOAT(i);
         yi = metxy((imet-1)*2+2) - FLOAT(j);
         di = SQRT(xi**2.+yi**2.)
         weightst(i,j,imet) = EXP(-4.60517018598809 * (di**2.) / (da**2.))
         sumw = sumw + weightst(i,j,imet)
 
       ENDDO
-    
+
       ! Normalize the weight
       DO imet = 1, nmetstat
         weightst(i,j,imet)=weightst(i,j,imet)/sumw
@@ -7046,7 +7096,7 @@ SUBROUTINE InitializeInterpolationMethods
 
 
   CASE (2) ! New Barnes interpolation, with adjustable parameters gammaB, delNfactor
-  
+
     ! Find average distance of a met station to closest other met station
     ! Distance is in grid units
     da=0.0
@@ -7079,7 +7129,7 @@ SUBROUTINE InitializeInterpolationMethods
     ELSEIF (gammaB>0.6) THEN ! 1.7826 factor calculated for gammaB=0.8
        kappa1 = 1.7826*4.0/pi**2.0 * (delNfactor*da)**2.0
     ENDIF
-    
+
     DO i = i1, im; DO j = j1, jm
 
     ! Estimate weight based on distance to met station imet and kappa1
@@ -7097,13 +7147,13 @@ SUBROUTINE InitializeInterpolationMethods
       i = NINT(metxy((imet-1)*2+1))
       j = NINT(metxy((imet-1)*2+2))
       DO jmet = 1, nmetstat
-	      
+
 	      xi = metxy((jmet-1)*2+1) - FLOAT(i);
 	      yi = metxy((jmet-1)*2+2) - FLOAT(j);
 	      di = xi**2.+yi**2.
 	      weightn(imet,jmet) = EXP(-di / kappa1)
     ENDDO; ENDDO
-    
+
 
   CASE (3) ! Inverse distance interpolation
 
@@ -7122,15 +7172,15 @@ SUBROUTINE InitializeInterpolationMethods
       ENDIF
       sumw = sumw + weightst(i,j,imet)
     ENDDO
-    
+
     ! Normalize the weight
     DO imet = 1, nmetstat
       weightst(i,j,imet)=weightst(i,j,imet)/sumw
     ENDDO
 
     ENDDO; ENDDO
-    
-  
+
+
   END SELECT
 
 END SUBROUTINE InitializeInterpolationMethods
@@ -7154,7 +7204,7 @@ SUBROUTINE CalculateMetResiduals (Qswresid,Taresid,RHresid,Qlwresid,uresid,vresi
   Qswresid(:)=0.0;  Taresid(:)=0.0;  RHresid(:)=0.0
   Qlwresid(:)=0.0;  uresid(:)=0.0;   vresid(:)=0.0
   IF (iinterp == 2) THEN
-    
+
     ! Calculate residuals from first Barnes pass at met station points
     DO k = 1, nmetstat
       i = NINT(metxy((k-1)*2+1))
@@ -7205,7 +7255,7 @@ SUBROUTINE InterpMetData (iin,jin,Qswresid,Taresid,RHresid,Qlwresid,uresid,vresi
   REAL :: sumw
 
   ! Initialize
-  Qsw = 0.0; Ta = 0.0; RH = 0.0; Qlw = 0.0; 
+  Qsw = 0.0; Ta = 0.0; RH = 0.0; Qlw = 0.0;
   uair = 0.0E0; vair = 0.0E0;
   ! Interpolation
   DO imet = 1, nmetstat
