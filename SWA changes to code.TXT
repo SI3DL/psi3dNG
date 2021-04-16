@@ -1,0 +1,55 @@
+Changes to psi3d, December 2010 by SWA
+
+Changes to read files with >999 cells in one or more directions
+  In subroutine input in si3d_utils
+    Changed lines 65, 67, 102, 106 to read in x-section and time series file
+      node numbers with I5 instead of I4
+  In subroutine bathy in si3d_utils
+    Changed line 557 to read in I5 in h file header
+
+
+Changes to output WSE in horizontal plane files
+  In subroutine outh in si3d_utils
+    Changed lines 1830, 1854, 1907, 1928
+
+    
+Bug fix in parallel version si3d_boundaryconditions
+  Changed line 3823 "nn" to "no"
+
+
+Changes to implement Barnes interpolation scheme
+  In si3d_types, declared 3 new global variables
+    Added INTEGER: iinterp to line 343
+    Added REAL: gammaB, delNfactor to line 344
+  In si3d_boundaryconditions
+    Major overhaul of InitializeInterpolationMethods subroutine (lines 5367-5492)
+    Added new subroutine CalculateMetResiduals (lines 5493 to 5544) for Barnes
+      interpolation method
+    Added new subroutine InterpMetData (lines 5545 to 5595) to interpolate met
+      data to cell i,j using one of 3 types of interpolation methods
+    Added calls to these new subroutines in subroutine DistributeMomentumHeatSourcesH
+      for case 10 (lines 5213,5223) and case 11 (lines 5280,5291) and in
+      subroutine DistributeMomentumHeatSources for case 10 (lines 4895,4904) and
+      case 11 (lines 4961,4969)
+  In subroutine input in si3d_utils
+    Added reading in of interpolation method and parameters if ifsurfbc>=10
+      (lines 220-230)
+
+
+Changes to make Smagorinsky horizontal diffusion model work
+  In subroutine input in si3d_utils
+    Changed line 242 to initialize dxdy
+  In subroutine exsal in si3d_procedures
+    Changed line 3034 so didn't multiply by ihd
+  In subroutine extracer in si3d_procedures
+    Changed line 4241 so didn't multiply by ihd
+
+
+Output of uh and vh instead of u and v at x-section points
+  In subroutine outv in si3d_utils
+    Changed lines 1385, 1386
+    Changed lines 1439, 1440
+
+
+    
+    

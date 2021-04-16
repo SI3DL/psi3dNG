@@ -1,0 +1,8 @@
+%---------------Código con cambios para expulsar ptrackhydro por pasos de tiempo:
+---------------------------------------------------------------------------------
+Mirar cambios con final = ABH
+--------------------------------------------------------------
+Cambios en si3d_types --> definir nueva variable
+           si3d_utils --> subroutine outp2
+           si3d.f90   --> call outp2
+           si3d_inp.txt --> añadir una variable más (= ptr)
